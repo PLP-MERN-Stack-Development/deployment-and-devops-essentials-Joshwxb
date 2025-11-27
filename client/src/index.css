@@ -1,0 +1,291 @@
+/* --- Global Base Styles (User's preferred reset and body styles) --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif; /* Keeping user's preferred font */
+  background-color: #f4f4f9; /* Keeping user's preferred light background */
+  color: #333;
+  line-height: 1.6;
+}
+
+/* --- Reusable Component Styles --- */
+
+/* Button Styling */
+button {
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+button:hover {
+  filter: brightness(1.1);
+}
+button:active {
+  transform: translateY(1px);
+}
+
+/* Form Styling */
+.form-container {
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 25px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.form-container label {
+  display: block;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #555;
+}
+.form-container input[type="text"], 
+.form-container textarea,
+.form-container select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1em;
+}
+.form-container textarea {
+    resize: vertical;
+}
+
+/* Error/Loading Messaging */
+.message-center {
+  text-align: center; 
+  margin-top: 50px;
+}
+.error-message {
+  color: white;
+  background-color: #dc3545; /* Red */
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.success-button {
+  background-color: #007bff;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  margin-top: 10px;
+}
+/* --- Auth Page Styles --- */
+
+/* Center the form content on the page */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh; /* Use 80% viewport height to center nicely */
+    padding: 20px;
+    background-color: #f4f7f6; /* Light background for contrast */
+}
+
+/* The form card itself */
+.auth-card {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Subtle 3D effect */
+    width: 100%;
+    max-width: 400px; /* Standard form width */
+}
+
+/* Form headings */
+.auth-card h2 {
+    text-align: center;
+    color: #333333;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #007bff; /* Primary color separator */
+    padding-bottom: 10px;
+}
+
+/* Input Fields (Targets inputs inside a .form-group for auth pages) */
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    box-sizing: border-box; /* Important for padding/width calculation */
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+/* Primary Button */
+.btn-primary-auth {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff; /* Primary blue */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.btn-primary-auth:hover {
+    background-color: #0056b3;
+}
+
+/* Link/Helper Text */
+.auth-link-text {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9em;
+}
+
+.auth-link-text a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+/* --------------------------------- */
+/* --- Responsive Navbar Styles --- */
+/* --------------------------------- */
+.navbar {
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-logo {
+    color: white;
+    text-decoration: none;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.nav-item {
+    color: white;
+    text-decoration: none;
+    padding: 8px 10px;
+    transition: background-color 0.2s;
+    border-radius: 4px;
+    white-space: nowrap; 
+}
+
+.nav-item:hover {
+    background-color: #555;
+}
+
+.nav-button {
+    background-color: #dc3545; /* Red for logout button */
+    border: none;
+    color: white;
+    padding: 8px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+.nav-button:hover {
+    background-color: #c82333;
+}
+
+.nav-user-text {
+    font-style: italic;
+    font-size: 0.9em;
+    color: #ccc;
+}
+
+/* Hamburger Styles (Hidden by default on large screens) */
+.hamburger {
+    display: none; /* Hide on desktop */
+    flex-direction: column;
+    justify-content: space-around;
+    width: 30px;
+    height: 25px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.bar {
+    width: 100%;
+    height: 3px;
+    background-color: white;
+    border-radius: 10px;
+    transition: all 0.3s linear;
+}
+
+/* --- Media Query for Mobile (Screen less than 768px wide) --- */
+@media (max-width: 768px) {
+    .nav-links {
+        /* Hide menu by default */
+        display: none; 
+        position: absolute;
+        top: 100%; /* Position right below the navbar */
+        left: 0;
+        width: 100%;
+        background-color: #333;
+        flex-direction: column;
+        padding: 10px 0;
+        z-index: 999;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .nav-links.active {
+        display: flex; /* Show menu when 'active' class is present */
+    }
+
+    .nav-links .nav-item, .nav-links .nav-button, .nav-links .nav-user-text {
+        text-align: center;
+        padding: 10px;
+        width: 100%;
+    }
+
+    .hamburger {
+        display: flex; /* Show hamburger icon on mobile */
+    }
+}
+/* --- Hamburger to X Transition Styles (Append to index.css) --- */
+
+/* State when the menu is open (button has class 'open') */
+.hamburger.open .bar:nth-child(2) {
+    opacity: 0; /* Hide the middle bar */
+}
+
+.hamburger.open .bar:nth-child(1) {
+    /* Rotate the top bar 45 degrees and move it into the center */
+    transform: translateY(11px) rotate(45deg); 
+}
+
+.hamburger.open .bar:nth-child(3) {
+    /* Rotate the bottom bar -45 degrees and move it into the center */
+    transform: translateY(-11px) rotate(-45deg);
+}
+
+/* Ensure the bars have space between them on small screens for the transition to work */
+@media (max-width: 768px) {
+    .hamburger {
+        justify-content: space-between; /* Creates the space for the bars to move */
+    }
+}
