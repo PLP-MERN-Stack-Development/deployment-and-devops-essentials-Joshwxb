@@ -8,24 +8,30 @@ import axios from 'axios';
  * @returns {{ data: any, isLoading: boolean, error: string | null, refetch: function }}
  */
 const useApi = (url, dependencies = []) => {
-    const [data, setData] = useState(null);
+    // 💡 FIX: Initialize data as an empty array []
+    const [data, setData] = useState([]); 
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
     // Function to perform the fetch operation
     const fetchData = async () => {
+        // Only run fetch if a URL is provided (e.g., PostForm uses null URL sometimes)
+        if (!url) {
+            setIsLoading(false);
+            return;
+        }
+
         setIsLoading(true);
         setError(null);
         try {
-            // Because we set up the proxy in vite.config.js, 
-            // the client automatically redirects this call to http://localhost:5000/api/...
             const response = await axios.get(url);
             setData(response.data);
         } catch (err) {
-            // Check for specific error message from server response
             const errorMessage = err.response?.data?.message || err.message;
             setError(errorMessage);
-            setData(null);
+            // Optional: You can keep data as [] here, or set it to null depending on preference. 
+            // Keeping it [] is safer for the map function on the frontend.
+            setData([]); 
         } finally {
             setIsLoading(false);
         }
@@ -33,12 +39,9 @@ const useApi = (url, dependencies = []) => {
 
     useEffect(() => {
         fetchData();
-    // The dependency array ensures fetchData runs when dependencies change.
-    // Eslint rule is disabled because dependencies are passed by the user.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [url, ...dependencies]);
 
-    // refetch is returned so users can manually trigger a data update (e.g., after POST/PUT/DELETE)
     return { data, isLoading, error, refetch: fetchData };
 };
 
