@@ -8,6 +8,11 @@ import axios from 'axios';
  * @returns {{ data: any, isLoading: boolean, error: string | null, refetch: function }}
  */
 const useApi = (url, dependencies = []) => {
+    // 🔗 Define the BASE_URL using the Vite environment variable.
+    // In production (Vercel), this will be the Render URL (e.g., https://blog-mern-api.onrender.com).
+    // In local development, it will be an empty string, allowing the Vite proxy in vite.config.js to work.
+    const BASE_URL = import.meta.env.VITE_BACKEND_URL || '';
+    
     // 💡 FIX: Initialize data as an empty array []
     const [data, setData] = useState([]); 
     const [isLoading, setIsLoading] = useState(true);
@@ -15,7 +20,7 @@ const useApi = (url, dependencies = []) => {
 
     // Function to perform the fetch operation
     const fetchData = async () => {
-        // Only run fetch if a URL is provided (e.g., PostForm uses null URL sometimes)
+        // Only run fetch if a URL is provided
         if (!url) {
             setIsLoading(false);
             return;
@@ -24,13 +29,15 @@ const useApi = (url, dependencies = []) => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await axios.get(url);
+            // Construct the full URL: BASE_URL + relative path (e.g., /api/posts)
+            const fullUrl = `${BASE_URL}${url}`;
+            
+            const response = await axios.get(fullUrl);
             setData(response.data);
         } catch (err) {
+            // Error handling remains the same
             const errorMessage = err.response?.data?.message || err.message;
             setError(errorMessage);
-            // Optional: You can keep data as [] here, or set it to null depending on preference. 
-            // Keeping it [] is safer for the map function on the frontend.
             setData([]); 
         } finally {
             setIsLoading(false);
