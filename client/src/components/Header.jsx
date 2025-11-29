@@ -33,7 +33,7 @@ const Header = () => {
         <header className="navbar">
             
             <Link to="/" className="nav-logo" onClick={() => handleNavigationClick('/')}>
-                JOSH Blog
+                WeBlog
             </Link>
 
             {/* 2. Hamburger Icon - ADDING conditional 'open' class for X icon transition */}

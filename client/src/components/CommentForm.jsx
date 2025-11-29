@@ -16,7 +16,7 @@ const CommentForm = ({ postId, onCommentAdded }) => {
     if (!isAuthenticated) {
         return (
             <p style={{ marginTop: '30px', padding: '15px', border: '1px solid #ccc', borderRadius: '5px', backgroundColor: '#f5f5f5', textAlign: 'center' }}>
-                You must be **logged in** to post a comment.
+                You must be logged in to post a comment.
             </p>
         );
     }
