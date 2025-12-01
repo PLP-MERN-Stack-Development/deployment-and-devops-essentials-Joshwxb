@@ -1,19 +1,16 @@
 // server/routes/commentRoutes.js
 
-import express from 'express';
-import { createComment, getCommentsByPostId } from '../controllers/commentController.js';
-import { authMiddleware } from '../middleware/authMiddleware.js';
+import express from 'express'; // Use import instead of require
+import { createComment, getCommentsByPostId } from '../controllers/commentController.js'; // Use import, ensure .js extension
+import { authMiddleware } from '../middleware/authMiddleware.js'; // Use import, ensure .js extension
 
 const router = express.Router();
 
-// 💡 CHANGE 1: Explicitly add '/posts' to the path for fetching comments.
-// Full route: GET /api/comments/posts/:postId
-router.get('/posts/:postId', getCommentsByPostId);
+// Route to fetch comments for a post (Public access)
+router.get('/:postId', getCommentsByPostId);
 
-// 💡 CHANGE 2: Explicitly add '/posts' to the path for creating comments.
-// Full route: POST /api/comments/posts/:postId
-// NOTE: We need the postId in the path to associate the comment.
-router.post('/posts/:postId', authMiddleware, createComment);
+// Route to create a new comment (Private access, requires login)
+router.post('/', authMiddleware, createComment);
 
 // Change the export from CommonJS (module.exports) to ES Module (export default)
 export default router;
