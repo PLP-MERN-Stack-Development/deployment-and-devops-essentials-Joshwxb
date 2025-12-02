@@ -2,30 +2,35 @@
 
 import axios from 'axios';
 
-// Get the base URL from the environment variables (Vite-specific import method)
-// During local dev, it falls back to the proxy URL (localhost:5173/api)
-// During Vercel deployment, it uses the VITE_API_BASE_URL=https://your-render-url/api
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'; // Use environment variable
+// 💡 FIX 1: Use VITE_BACKEND_URL to match your Render environment variable setup.
+// If not found (local dev), it defaults to empty string.
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || ''; 
 
 // 1. Create the base Axios instance
 const api = axios.create({
-    baseURL: API_BASE_URL, // <--- FIX IS HERE: Use the dynamic URL
+    // In production, baseURL will be the full Render URL.
+    // In local dev, baseURL is '', which is handled by the interceptor below.
+    baseURL: API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-// 2. Add a request interceptor to attach the JWT token
-// This runs BEFORE every request leaves the client.
+// 2. Add a request interceptor to attach the JWT token and handle local proxying
 api.interceptors.request.use(
     (config) => {
-        // Get the token from Local Storage
         const token = localStorage.getItem('token');
         
         if (token) {
-            // Attach the token to the Authorization header
             config.headers.Authorization = `Bearer ${token}`;
         }
+        
+        // 💡 FIX 2: If running locally and API_BASE_URL is empty, prepend '/api' to the URL
+        // so the local Vite proxy can redirect it to the backend (e.g., /api/auth/register).
+        if (API_BASE_URL === '') {
+            config.url = `/api${config.url}`;
+        }
+
         return config;
     },
     (error) => {
@@ -38,9 +43,7 @@ const handleAxiosError = (error) => {
     let message = 'An unknown error occurred.';
 
     if (error.response) {
-        // Server responded with a status code outside the 2xx range
         if (error.response.data && error.response.data.message) {
-            // Use the specific error message from the server (e.g., validation errors)
             message = error.response.data.message;
         } else if (error.response.status === 401) {
             message = 'Unauthorized: Please log in.';
@@ -48,23 +51,22 @@ const handleAxiosError = (error) => {
             message = `Request failed with status code ${error.response.status}`;
         }
     } else if (error.request) {
-        // Request was made but no response received (e.g., server offline)
         message = 'No response from server. Check API connection.';
     } else {
-        // Something else triggered the error
         message = error.message;
     }
     
-    // Reject the promise with the clean error message
+    // CRASH FIX: This ensures a standard Error object with a message is thrown,
+    // which prevents Register.jsx from crashing on 'undefined'.
     return Promise.reject(new Error(message));
 };
 
-// --- AUTHENTICATION API CALLS (NEW) ---
+// --- AUTHENTICATION API CALLS (Fixed registration logic internally) ---
 
 export const registerUser = async (userData) => {
     try {
         const response = await api.post('/auth/register', userData);
-        return response.data;
+        return response.data; // This returns the { user, token } required by Register.jsx
     } catch (error) {
         return handleAxiosError(error);
     }
@@ -79,7 +81,7 @@ export const loginUser = async (credentials) => {
     }
 };
 
-// --- POSTS API CALLS (UPDATED to use the 'api' instance) ---
+// --- POSTS API CALLS (Looks correct) ---
 
 export const fetchPosts = async () => {
     try {
@@ -126,7 +128,7 @@ export const deletePost = async (id) => {
     }
 };
 
-// --- CATEGORIES API CALLS (UPDATED to use the 'api' instance) ---
+// --- CATEGORIES API CALLS (Looks correct) ---
 
 export const fetchCategories = async () => {
     try {
@@ -137,12 +139,12 @@ export const fetchCategories = async () => {
     }
 };
 
-// --- COMMENTS API CALLS (NEW FEATURE) ---
-// Note: These need the full error handling wrapper because they use the API instance.
+// --- COMMENTS API CALLS (FIXED ROUTING) ---
 
 export const fetchComments = async (postId) => {
     try {
-        const response = await api.get(`/comments/${postId}`);
+        // 💡 FIX 3: Updated to match the new backend route: /api/comments/posts/:postId
+        const response = await api.get(`/comments/posts/${postId}`); 
         return response.data;
     } catch (error) {
         return handleAxiosError(error);
@@ -151,13 +153,10 @@ export const fetchComments = async (postId) => {
 
 export const createComment = async (postId, content) => {
     try {
-        // The interceptor will automatically add the token, we just send the required body.
-        const response = await api.post(`/comments`, { postId, content }); 
+        // 💡 FIX 4: Updated to match the new backend route: /api/comments/posts/:postId
+        const response = await api.post(`/comments/posts/${postId}`, { content }); 
         return response.data;
     } catch (error) {
         return handleAxiosError(error);
     }
 };
-
-// Note: createCategory and updateCategory not implemented in this scope but would use the 'api' instance.
-// We are skipping them for now to focus on the core user tasks.
