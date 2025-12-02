@@ -6,11 +6,11 @@ import { authMiddleware } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// 💡 FIX 1: Add '/posts/' to the GET route.
+// 🚀 FIX: Updated to use '/posts/:postId' to match the fixed frontend path and resolve the 404 error.
 // Full Backend Route: GET /api/comments/posts/:postId
 router.get('/posts/:postId', getCommentsByPostId);
 
-// 💡 FIX 2: Add '/posts/' to the POST route and ensure the :postId parameter is captured.
+// 🚀 FIX: Updated to use '/posts/:postId' for creating a comment, ensuring the post ID is in the URL.
 // Full Backend Route: POST /api/comments/posts/:postId
 router.post('/posts/:postId', authMiddleware, createComment);
 
