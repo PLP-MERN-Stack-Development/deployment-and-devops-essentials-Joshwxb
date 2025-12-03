@@ -13,13 +13,13 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI;
 
-// --- CORS Configuration (The essential fix) ---
+// --- CORS Configuration ---
 const allowedOrigins = [
-    // 1. VERCEL FRONTEND DOMAIN 
+    // VERCEL FRONTEND DOMAIN 
     'https://weblogx.vercel.app', 
-    // 2. The Render URL
+    // The Render URL
     'https://weblog-yas1.onrender.com', 
-    // 3. Localhost for development
+    // Localhost for development
     'http://localhost:5173'
 ];
 
@@ -37,8 +37,8 @@ const corsOptions = {
 };
 
 // --- Middleware ---
-app.use(cors(corsOptions)); // <-- USING EXPLICIT OPTIONS HERE
-app.use(express.json()); // Allows the server to accept JSON data in the request body
+app.use(cors(corsOptions)); 
+app.use(express.json()); 
 
 // --- API Routes ---
 app.use('/api/categories', categoryRoutes);
@@ -70,9 +70,10 @@ const startServer = async () => {
     // 1. Connect to the Database
     await connectDB();
 
-    // 2. Start the Express server
-    app.listen(PORT, () => {
-        console.log(`📡 Server listening on http://localhost:${PORT}`);
+    // 2. Start the Express server, binding explicitly to 0.0.0.0
+    const HOST = '0.0.0.0'; // Explicitly bind to all interfaces for cloud deployment
+    app.listen(PORT, HOST, () => {
+        console.log(`📡 Server listening on http://${HOST}:${PORT}`);
     });
 };
 
