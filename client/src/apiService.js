@@ -315,11 +315,4 @@ export const createComment = async (postId, content) => {
         return handleAxiosError(error);
 
     }
-
 };
-
-
-
-// Note: createCategory and updateCategory not implemented in this scope but would use the 'api' instance.
-
-// We are skipping them for now to focus on the core user tasks.
