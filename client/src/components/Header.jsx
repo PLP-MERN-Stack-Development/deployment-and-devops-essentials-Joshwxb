@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'; 
+// 🚀 1. CORRECTED Import path to match the actual file name 'logo.png.jpg'
+import logo from '../assets/logo.png.jpg'; 
 
 const Header = () => {
     const { isAuthenticated, user, logout } = useAuth();
@@ -32,19 +34,21 @@ const Header = () => {
     return (
         <header className="navbar">
             
+            {/* 🚀 2. Nav Logo: Displays the Image followed by the Text */}
             <Link to="/" className="nav-logo" onClick={() => handleNavigationClick('/')}>
-                WeBlog
+                <img src={logo} alt="Weblog Logo" className="navbar-logo-img" /> 
+                WEBLOG
             </Link>
 
-            {/* 2. Hamburger Icon - ADDING conditional 'open' class for X icon transition */}
+            {/* 3. Hamburger Icon - ADDING conditional 'open' class for X icon transition */}
             <button className={`hamburger ${isMenuOpen ? 'open' : ''}`} onClick={toggleMenu}>
                 <span className="bar"></span>
                 <span className="bar"></span>
                 <span className="bar"></span>
             </button>
 
-            {/* 3. Navigation Links Container 
-               - Adds 'active' class when isMenuOpen is true (mobile click). */}
+            {/* 4. Navigation Links Container 
+                - Adds 'active' class when isMenuOpen is true (mobile click). */}
             <nav className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
                 
                 <Link to="/" className="nav-item" onClick={() => handleNavigationClick('/')}>
@@ -59,7 +63,8 @@ const Header = () => {
                         </Link>
                         
                         <span className="nav-item nav-user-text">
-                            Hello, {user.username || user.email}!
+                            {/* Using optional chaining (?) for safer access */}
+                            Hello, {user?.username || user?.email}! 
                         </span> 
                         
                         <button onClick={handleLogout} className="nav-item nav-button">

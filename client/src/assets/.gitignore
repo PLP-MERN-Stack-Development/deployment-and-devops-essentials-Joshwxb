@@ -1,0 +1,12 @@
+# Dependencies
+/node_modules
+/client/node_modules
+
+# Production/Builds
+/client/dist
+/server/dist
+
+# Logs and Lock Files
+npm-debug.log*
+yarn-debug.log*
+.DS_Store

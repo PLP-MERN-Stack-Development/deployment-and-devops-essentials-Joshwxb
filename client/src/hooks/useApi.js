@@ -35,8 +35,20 @@ const useApi = (url, dependencies = []) => {
             const response = await axios.get(fullUrl);
             setData(response.data);
         } catch (err) {
-            // Error handling remains the same
-            const errorMessage = err.response?.data?.message || err.message;
+            // 🚀 FIX: More robust error handling for connection refusals (ECONNREFUSED)
+            let errorMessage = "An unknown error occurred.";
+            
+            if (axios.isAxiosError(err) && !err.response) {
+                // If the error is an Axios error but has no response, it's a network/connection failure
+                errorMessage = "Connection refused. Is the backend server running?";
+            } else if (err.response && err.response.data && err.response.data.message) {
+                // Standard API error response (e.g., 404, 500 from server)
+                errorMessage = err.response.data.message;
+            } else if (err.message) {
+                // Fallback for generic errors
+                errorMessage = err.message;
+            }
+
             setError(errorMessage);
             setData([]); 
         } finally {
