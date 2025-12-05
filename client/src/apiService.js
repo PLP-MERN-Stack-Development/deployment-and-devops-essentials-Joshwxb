@@ -12,7 +12,7 @@ import axios from 'axios';
 
 // During Vercel deployment, it uses the VITE_API_BASE_URL=https://your-render-url/api
 
-const API_BASE_URL = 'https://weblog-yas1.onrender.com/api';
+const API_BASE_URL = '/api';
 // 1. Create the base Axios instance
 
 const api = axios.create({
