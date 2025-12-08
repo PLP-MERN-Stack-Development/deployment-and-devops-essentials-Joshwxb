@@ -1,36 +1,31 @@
 {
-  "name": "server",
+  "name": "backend",
   "version": "1.0.0",
   "description": "MERN Stack Blog API",
-  "main": "server.js",
+  "main": "server/server.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon server.js",
-    "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "cd client && npm install && npm run build" 
+    "start": "node server/server.js",
+    "dev": "cross-env NODE_ENV=development nodemon server/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "mern",
-    "blog",
-    "render"
+    "express",
+    "api"
   ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^6.0.0",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
-    "express": "^5.1.0",
-    "express-validator": "^7.3.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^9.0.0",
-    "path": "^0.12.7"
+    "mongoose": "^8.4.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11",
-    "autoprefixer": "^10.4.22",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.17"
+    "nodemon": "^3.1.2",
+    "cross-env": "^7.0.3" 
   }
 }

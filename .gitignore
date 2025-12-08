@@ -1,0 +1,14 @@
+# Node.js dependencies
+/node_modules
+
+# Environment variables
+# This is crucial for security! NEVER commit your actual API keys or database URLs.
+.env
+
+# Build outputs
+/dist
+/build
+
+# Logs and system files
+npm-debug.log*
+.DS_Store
