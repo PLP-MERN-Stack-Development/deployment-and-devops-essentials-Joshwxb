@@ -23,6 +23,10 @@ const PostDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { user } = useContext(AuthContext); 
+    
+    // 🎯 FIX: Define the Base URL for fallback/older posts.
+    // Use the base URL for local testing. This is only prepended if post.imageUrl is NOT a full URL.
+    const BACKEND_BASE_URL = 'http://localhost:5000'; 
     
     // Original Post fetching hook
     const { data: post, isLoading: isPostLoading, error: postError } = useApi(`/api/posts/${id}`);
@@ -114,19 +118,23 @@ const PostDetail = () => {
           Published: {new Date(post.createdAt).toLocaleDateString()}
         </span>
       </div>
-      
-      {/* 🌟 NEW: Image Display Logic */}
-      {post.imageUrl && (
-          <div style={imageWrapperStyle}>
-              <img 
-                  // Construct the full URL using the backend host (running on port 5000)
-                  src={`http://localhost:5000${post.imageUrl}`} 
-                  alt={post.title} 
-                  style={imageStyle}
-              />
-          </div>
-      )}
-      {/* 🌟 END NEW: Image Display Logic */}
+      
+      {/* 🌟 FIX: Image Display Logic */}
+      {post.imageUrl && (
+          <div style={imageWrapperStyle}>
+              <img 
+                  // FIX IMPLEMENTED HERE: Check if the URL is a full web URL (Cloudinary)
+                  src={
+                      post.imageUrl.startsWith('http') 
+                      ? post.imageUrl 
+                      : `${BACKEND_BASE_URL}${post.imageUrl}`
+                  } 
+                  alt={post.title} 
+                  style={imageStyle}
+              />
+          </div>
+      )}
+      {/* 🌟 END FIX: Image Display Logic */}
       
       <div style={contentStyle}>
         <p>{post.content}</p>
@@ -255,17 +263,17 @@ const deleteButtonStyle = {
 
 // 🌟 NEW IMAGE STYLES
 const imageWrapperStyle = {
-    margin: '0 0 30px 0',
-    borderRadius: '8px',
-    overflow: 'hidden',
-    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+    margin: '0 0 30px 0',
+    borderRadius: '8px',
+    overflow: 'hidden',
+    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
 };
 
 const imageStyle = {
-    width: '100%', 
-    maxHeight: '400px', // Restrict height to prevent overly long images
-    objectFit: 'cover', // Ensures the image covers the area nicely
-    display: 'block',
+    width: '100%', 
+    maxHeight: '400px', // Restrict height to prevent overly long images
+    objectFit: 'cover', // Ensures the image covers the area nicely
+    display: 'block',
 };
 // 🌟 END NEW IMAGE STYLES
 

@@ -45,8 +45,12 @@ const Home = () => {
                       // Wrap the image in a link to the post detail page
                       <Link to={`/posts/${post._id}`} style={{textDecoration: 'none'}}>
                           <img 
-                              // 🛑 FIX APPLIED: Use the dynamic API_BASE_URL here
-                              src={`${API_BASE_URL}${post.imageUrl}`} 
+                              // 🎯 CRITICAL FIX APPLIED: Check if it's already a full URL
+                              src={
+                                    post.imageUrl.startsWith('http') 
+                                        ? post.imageUrl 
+                                        : `${API_BASE_URL}${post.imageUrl}`
+                                } 
                               alt={post.title} 
                               style={thumbnailStyle}
                           />

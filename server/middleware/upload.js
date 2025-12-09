@@ -1,56 +1,50 @@
 // middleware/upload.js
-
-const multer = require('multer'); // CRITICAL FIX: Use require()
-const path = require('path'); // CRITICAL FIX: Use require()
-const fs = require('fs'); // CRITICAL FIX: Use require()
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const multer = require('multer');
 
 // --- Configuration ---
 
-// 1. Ensure the 'uploads' directory exists
-const uploadsDir = path.join(process.cwd(), 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-    // Synchronously create the directory if it doesn't exist
-    fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-// 2. Define the storage strategy for Multer
-const storage = multer.diskStorage({
-    // Set the destination folder for uploads
-    destination: (req, file, cb) => {
-        // null means no error, and the path to the directory
-        cb(null, 'uploads/'); 
-    },
-    
-    // Define the file name to avoid collisions
-    filename: (req, file, cb) => {
-        // Create a unique name: timestamp + original extension
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname)); 
-    }
+// 1. Configure Cloudinary using environment variables
+// Ensure these variables are set in your .env file
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// 3. Define a file filter (optional, but good for security and validation)
+// 2. Define the storage strategy for Multer using Cloudinary
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'mern-blog-uploads', // Specify a folder in your Cloudinary account
+        allowed_formats: ['jpeg', 'png', 'jpg', 'webp'],
+        // Optional: Image processing transformations (e.g., resizing)
+        transformation: [{ width: 800, crop: 'limit' }] 
+    },
+});
+
+// 3. Define a file filter
 const fileFilter = (req, file, cb) => {
-    // Check for common image mimetypes
-    if (file.mimetype.startsWith('image/')) {
-        cb(null, true); // Accept the file
-    } else {
-        // Reject file and set an error message
-        cb(new Error('Only images (JPEG, PNG, GIF, WebP) are allowed!'), false); 
-    }
+    // Check for common image mimetypes
+    if (file.mimetype.startsWith('image/')) {
+        cb(null, true); // Accept the file
+    } else {
+        // Reject file and set an error message
+        cb(new Error('Only images (JPEG, PNG, GIF, WebP) are allowed!'), false); 
+    }
 };
+
 
 // 4. Create the Multer instance
 const upload = multer({
-    storage: storage,
-    limits: { 
-        fileSize: 1024 * 1024 * 5 // Max file size 5 MB
-    },
-    fileFilter: fileFilter
+    storage: storage, // Use the Cloudinary storage engine
+    limits: { 
+        fileSize: 1024 * 1024 * 5 // Max file size 5 MB
+    },
+    fileFilter: fileFilter
 });
 
 // Export the middleware configured to handle a single file named 'image'
-const uploadImage = upload.single('image');
-
-// ⬅️ CRITICAL FIX: Use CommonJS export
-module.exports = { uploadImage };
+// 🎯 FIX: Export the Multer middleware function directly, not inside an object.
+module.exports = upload.single('image');

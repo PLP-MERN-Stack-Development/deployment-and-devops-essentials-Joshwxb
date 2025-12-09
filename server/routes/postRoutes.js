@@ -1,10 +1,10 @@
-// postRoutes.js
+// server/routes/postRoutes.js
 
 const express = require('express');
 const Post = require('../models/Post'); 
 const { authMiddleware } = require('../middleware/authMiddleware'); 
-// 🌟 NEW: Import the Multer upload middleware
-const { uploadImage } = require('../middleware/upload'); 
+// 🎯 FIX 1: Import the Multer function DIRECTLY (Resolved the [object Undefined] error)
+const uploadImage = require('../middleware/upload'); 
 const { createPostValidation, updatePostValidation } = require('../middleware/postValidator'); 
 const router = express.Router();
 
@@ -46,30 +46,25 @@ router.get('/:id', async (req, res, next) => {
 router.post(
     '/', 
     authMiddleware, 
-    uploadImage, // <--- MULTER MIDDLEWARE RUNS HERE
+    uploadImage, // <--- Multer/Cloudinary runs here
     createPostValidation, 
     async (req, res, next) => { 
         try {
-            // 🌟 IMAGE HANDLING: Check if a file was uploaded by Multer
-            const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+            // 🎯 FIX 2: Use the full Cloudinary URL from req.file.path
+            const imageUrl = req.file ? req.file.path : null;
             
-            // CORRECTED: Ensure the 'user' field is set to the logged-in user's ID
             const newPost = new Post({ 
                 ...req.body, 
                 user: req.user._id, 
-                // 🌟 ADD: Store the image URL if one exists
-                imageUrl: imageUrl, 
+                imageUrl: imageUrl, // Saves the Cloudinary HTTPS URL
             });
             
             const savedPost = await newPost.save();
             
-            // Populate category before sending response
             await savedPost.populate('category', 'name');
 
             res.status(201).json(savedPost);
         } catch (error) {
-            // NOTE: If an error occurs, the file may have been saved by Multer. 
-            // In a production app, you would add logic here to delete the saved file if the database operation fails.
             next(error);
         }
     }
@@ -77,11 +72,10 @@ router.post(
 
 
 // PUT /api/posts/:id - Update an existing blog post (PRIVATE)
-// 🌟 FIX: Insert the uploadImage middleware here.
 router.put(
     '/:id', 
     authMiddleware, 
-    uploadImage, // <--- MULTER MIDDLEWARE RUNS HERE
+    uploadImage, // <--- Multer/Cloudinary runs here
     updatePostValidation, 
     async (req, res, next) => { 
         try {
@@ -92,7 +86,7 @@ router.put(
                 return res.status(404).json({ message: 'Post not found' });
             }
 
-            // 2. AUTHORIZATION CHECK: Ensure the post belongs to the authenticated user
+            // 2. AUTHORIZATION CHECK
             if (post.user.toString() !== req.user._id.toString()) {
                 return res.status(403).json({ message: 'Not authorized to update this post' });
             }
@@ -101,20 +95,18 @@ router.put(
             const updateFields = { ...req.body };
             
             if (req.file) {
-                // New file uploaded: Set new URL, and delete the old file (optional, but recommended for cleanup)
-                updateFields.imageUrl = `/uploads/${req.file.filename}`;
-                // In a full implementation, you would delete the old file on the server here
-                // (e.g., using fs.unlinkSync(path.join(process.cwd(), post.imageUrl)))
+                // 🎯 FIX 3: Use the full Cloudinary URL from req.file.path
+                updateFields.imageUrl = req.file.path;
+                // Note: Cloudinary cleanup logic is often handled in the controller, but here's where the URL is set.
             } else if (req.body.deleteImage === 'true') { 
-                // Handle a separate field from the frontend to explicitly clear the image
                 updateFields.imageUrl = null;
-                // In a full implementation, you would delete the old file on the server here
+                // Cloudinary cleanup for deletion would go here or in a controller
             }
 
             // 3. Update the post
             const updatedPost = await Post.findByIdAndUpdate(
                 id,
-                updateFields, // Now includes imageUrl if a file was uploaded
+                updateFields, // Now includes the correct Cloudinary imageUrl
                 { new: true, runValidators: true }
             ).populate('category', 'name');
             
@@ -128,32 +120,23 @@ router.put(
     }
 );
 
-// DELETE /api/posts/:id - Delete a blog post (PRIVATE - REQUIRES authMiddleware & AUTHORIZATION)
+// DELETE /api/posts/:id - Delete a blog post (PRIVATE)
 router.delete('/:id', authMiddleware, async (req, res, next) => { 
     try {
         const { id } = req.params;
         
-        // 1. Find the post by ID
         const post = await Post.findById(id);
 
         if (!post) {
             return res.status(404).json({ message: 'Post not found' });
         }
 
-        // 2. AUTHORIZATION CHECK: Ensure the post belongs to the authenticated user
         if (post.user.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: 'Not authorized to delete this post' });
         }
         
-        // 🌟 CLEANUP: Delete the associated image file before deleting the post
-        // If you were using a separate controller file, this logic would go there.
-        /*
-        if (post.imageUrl) {
-            // Example: fs.unlinkSync(path.join(process.cwd(), post.imageUrl))
-        }
-        */
+        // Cleanup logic would be here if you implement Cloudinary deletion directly in the route.
         
-        // 3. Delete the post
         await Post.findByIdAndDelete(id);
         
         res.status(204).send();
