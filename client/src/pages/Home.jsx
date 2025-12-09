@@ -81,7 +81,7 @@ const Home = () => {
       
       {/* 🌟 UPDATED: Footer Element with Icons */}
       <footer style={footerStyle}>
-          <p>&copy; {new Date().getFullYear()} All right reserved weblog.</p>
+          <p>&copy; {new Date().getFullYear()} All right reserved.</p>
           <div style={footerLinksStyle}>
               {/* Note: I'm keeping the original Link targets but using Icons */}
               <Link to="/twitter" style={footerIconStyle} aria-label="X Twitter Link">
