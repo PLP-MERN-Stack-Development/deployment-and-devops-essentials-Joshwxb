@@ -5,6 +5,10 @@ import useApi from '../hooks/useApi.js';
 import { FaXTwitter, FaInstagram, FaTiktok } from 'react-icons/fa6'; 
 
 const Home = () => {
+  // 🛑 FIX: Define the API_BASE_URL for image loading in a deployed environment
+  // This ensures images load from the correct Render URL when deployed on Vercel.
+  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
   // Use useLocation to check for navigation state messages (e.g., after deletion)
   const location = useLocation();
   const message = location.state?.message;
@@ -41,8 +45,8 @@ const Home = () => {
                       // Wrap the image in a link to the post detail page
                       <Link to={`/posts/${post._id}`} style={{textDecoration: 'none'}}>
                           <img 
-                              // Ensure the image URL points to the backend server
-                              src={`http://localhost:5000${post.imageUrl}`} 
+                              // 🛑 FIX APPLIED: Use the dynamic API_BASE_URL here
+                              src={`${API_BASE_URL}${post.imageUrl}`} 
                               alt={post.title} 
                               style={thumbnailStyle}
                           />
@@ -70,24 +74,24 @@ const Home = () => {
           </div>
         )}
       </div>
-      
-      {/* 🌟 UPDATED: Footer Element with Icons */}
-      <footer style={footerStyle}>
-          <p>&copy; {new Date().getFullYear()} All right reserved weblog.</p>
-          <div style={footerLinksStyle}>
-              {/* Note: I'm keeping the original Link targets but using Icons */}
-              <Link to="/twitter" style={footerIconStyle} aria-label="X Twitter Link">
-                  <FaXTwitter size={24} /> 
-              </Link>
-              <Link to="/instagram" style={footerIconStyle} aria-label="Instagram Link">
-                  <FaInstagram size={24} />
-              </Link>
-              <Link to="/tiktok" style={footerIconStyle} aria-label="Tiktok Link">
-                  <FaTiktok size={24} />
-              </Link>
-          </div>
-      </footer>
-      {/* 🌟 END UPDATED: Footer Element */}
+      
+      {/* 🌟 UPDATED: Footer Element with Icons */}
+      <footer style={footerStyle}>
+          <p>&copy; {new Date().getFullYear()} All right reserved weblog.</p>
+          <div style={footerLinksStyle}>
+              {/* Note: I'm keeping the original Link targets but using Icons */}
+              <Link to="/twitter" style={footerIconStyle} aria-label="X Twitter Link">
+                  <FaXTwitter size={24} /> 
+              </Link>
+              <Link to="/instagram" style={footerIconStyle} aria-label="Instagram Link">
+                  <FaInstagram size={24} />
+              </Link>
+              <Link to="/tiktok" style={footerIconStyle} aria-label="Tiktok Link">
+                  <FaTiktok size={24} />
+              </Link>
+          </div>
+      </footer>
+      {/* 🌟 END UPDATED: Footer Element */}
 
     </div>
   );
@@ -98,7 +102,7 @@ const containerStyle = {
     maxWidth: '900px',
     margin: '30px auto',
     padding: '0 20px',
-    flexGrow: 1, // Allows content to push the footer down
+    flexGrow: 1, // Allows content to push the footer down
 };
 const titleStyle = {
     textAlign: 'center',
@@ -170,26 +174,26 @@ const successMessageStyle = {
 
 // 🌟 NEW FOOTER STYLES
 const footerStyle = {
-    marginTop: '50px',
-    padding: '30px 20px',
-    backgroundColor: '#f8f9fa',
-    borderTop: '1px solid #e9ecef',
-    textAlign: 'center',
-    color: '#6c757d',
-    width: '100%',
+    marginTop: '50px',
+    padding: '30px 20px',
+    backgroundColor: '#f8f9fa',
+    borderTop: '1px solid #e9ecef',
+    textAlign: 'center',
+    color: '#6c757d',
+    width: '100%',
 };
 
 const footerLinksStyle = {
-    marginTop: '15px',
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '30px', // Increased gap for icons
+    marginTop: '15px',
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '30px', // Increased gap for icons
 };
 
 // 🌟 NEW Icon Style (replaces footerLinkItemStyle)
 const footerIconStyle = {
-    color: '#007bff',
-    // We don't need textDecoration or fontWeight for icons, but we might add hover effects later
+    color: '#007bff',
+    // We don't need textDecoration or fontWeight for icons, but we might add hover effects later
 };
 // 🌟 END NEW FOOTER STYLES
 
