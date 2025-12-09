@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useApi from '../hooks/useApi.js'; 
-import { createPost, updatePost } from '../apiService.js';
+// NOTE: You'll need to modify createPost and updatePost in apiService.js
+import { createPost, updatePost } from '../apiService.js'; 
 
 const PostForm = () => {
   const { id } = useParams();
@@ -13,6 +14,12 @@ const PostForm = () => {
   const [content, setContent] = useState('');
   const [category, setCategory] = useState(''); 
   
+  // 🌟 NEW: State to hold the selected image file
+  const [image, setImage] = useState(null); 
+  // 🌟 NEW: State to hold the URL of the existing image (for display in edit mode)
+  const [existingImageUrl, setExistingImageUrl] = useState('');
+
+
   // State for UI feedback
   const [formLoading, setFormLoading] = useState(false);
   const [submitError, setSubmitError] = useState(null);
@@ -33,22 +40,25 @@ const PostForm = () => {
       setTitle(existingPost.title);
       setContent(existingPost.content);
       
-      // 🚀 FIX: Add a check for existingPost.category before accessing ._id
+      // Handle existing category
       if (existingPost.category) {
-          // Handles both cases: category is a populated object OR it's just the ID string
           setCategory(existingPost.category._id || existingPost.category); 
       } else {
-          // If category is null/undefined, set a default empty state
-          setCategory(''); 
-      }
-    
+          setCategory(''); 
+      }
+      
+      // 🌟 NEW: Set existing image URL for display
+      if (existingPost.imageUrl) {
+          setExistingImageUrl(existingPost.imageUrl);
+      }
+
     } else if (!isEditMode && categories && categories.length > 0) {
       // CREATE MODE: Set default category immediately upon loading categories
       if (!category) {
           setCategory(categories[0]._id);
       }
     }
-  }, [isEditMode, existingPost, categories]); // Added categories to dependencies
+  }, [isEditMode, existingPost, categories]);
 
   // Handle Form Submission 
   const handleSubmit = async (e) => {
@@ -56,21 +66,29 @@ const PostForm = () => {
     setFormLoading(true);
     setSubmitError(null);
     
-    const postData = {
-        title,
-        content,
-        category,
-    };
+    // 🌟 CRITICAL CHANGE: Use FormData for file uploads
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('content', content);
+    formData.append('category', category);
+
+    // 🌟 Add the image file only if one was selected
+    if (image) {
+        formData.append('image', image);
+    }
+
     
     try {
         let result;
+        
+        // Pass the FormData object instead of the regular postData object
         if (isEditMode) {
-            result = await updatePost(id, postData);
+            // NOTE: Your backend must be configured to handle file uploads on PUT/PATCH
+            result = await updatePost(id, formData);
         } else {
-            result = await createPost(postData);
+            result = await createPost(formData);
         }
         
-        // Navigate to the newly created or updated post's detail page
         navigate(`/posts/${result._id}`);
 
     } catch (err) {
@@ -80,13 +98,18 @@ const PostForm = () => {
     }
   };
 
+  // 🌟 NEW: Handler for file input change
+  const handleImageChange = (e) => {
+      // e.target.files[0] contains the selected file
+      setImage(e.target.files[0]);
+  };
+
+
   if (isCategoriesLoading || (isEditMode && isPostLoading)) {
-    // REFACTORED: Use className="message-center"
     return <div className="message-center"><h2>Loading {isEditMode ? 'post and categories' : 'categories'}...</h2></div>;
   }
 
   if (categoryError || postError) {
-    // REFACTORED: Use className="message-center" and className="error-message"
     return (
         <div className="message-center">
             <h2 className="error-message">{categoryError || postError}</h2>
@@ -100,15 +123,11 @@ const PostForm = () => {
 
   // Render Form
   return (
-    // REFACTORED: Use className="form-container"
     <div className="form-container">
-      {/* Keeping h1 inline style minimal for centering/spacing */}
       <h1 style={{textAlign: 'center', marginBottom: '25px', color: '#333'}}>{isEditMode ? 'Edit Blog Post' : 'Create New Post'}</h1>
       
-      {/* Keeping form inline style minimal for grid layout */}
-      <form onSubmit={handleSubmit} style={{display: 'grid', gap: '15px'}}>
+      <form onSubmit={handleSubmit} style={{display: 'grid', gap: '15px'}} encType="multipart/form-data">
         
-        {/* REFACTORED: Use className="error-message" */}
         {submitError && <p className="error-message">{submitError}</p>}
 
         <label htmlFor="title">Title:</label>
@@ -118,6 +137,24 @@ const PostForm = () => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
+        />
+
+        {/* 🌟 NEW IMAGE INPUT FIELD */}
+        <label htmlFor="image">Feature Image:</label>
+        {isEditMode && existingImageUrl && (
+            <div style={{ marginBottom: '10px' }}>
+                <p>Current Image:</p>
+                {/* You might need to adjust the URL depending on your server setup */}
+                <img src={existingImageUrl} alt="Current Post" style={{ maxWidth: '100%', height: 'auto', maxHeight: '150px', display: 'block' }} />
+            </div>
+        )}
+        <input
+          id="image"
+          type="file"
+          accept="image/*" // Restrict to image files
+          onChange={handleImageChange}
+          // Do not require file input in edit mode unless replacing
+          required={!isEditMode} 
         />
 
         <label htmlFor="content">Content:</label>
@@ -144,7 +181,6 @@ const PostForm = () => {
           ))}
         </select>
         
-        {/* REFACTORED: Use className="success-button" */}
         <button type="submit" disabled={formLoading} className="success-button">
           {formLoading ? 'Submitting...' : isEditMode ? 'Update Post' : 'Create Post'}
         </button>
@@ -152,7 +188,5 @@ const PostForm = () => {
     </div>
   );
 };
-
-// --- REMOVED ALL INLINE STYLE CONSTANTS (centerStyle, containerStyle, etc.) ---
 
 export default PostForm;

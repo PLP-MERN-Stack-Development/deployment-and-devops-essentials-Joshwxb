@@ -210,7 +210,7 @@ button:active {
 }
 
 .nav-button {
-    background-color: #dc3545; /* Red for logout button */
+    background-color: #007bff; /* Red for logout button */
     border: none;
     color: white;
     padding: 8px 10px;
@@ -219,7 +219,7 @@ button:active {
     font-weight: bold;
 }
 .nav-button:hover {
-    background-color: #c82333;
+    background-color: #1c70ca;
 }
 
 .nav-user-text {
@@ -233,8 +233,8 @@ button:active {
     display: none; /* Hide on desktop */
     flex-direction: column;
     justify-content: space-around;
-    width: 30px;
-    height: 25px;
+    width: 27px;
+    height: 19px;
     background: transparent;
     border: none;
     cursor: pointer;

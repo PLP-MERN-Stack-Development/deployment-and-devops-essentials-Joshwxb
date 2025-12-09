@@ -2,6 +2,8 @@ import 'dotenv/config';
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
+// 🌟 NEW: Import path module for directory management
+import path from 'path'; 
 import categoryRoutes from './routes/categoryRoutes.js';
 import postRoutes from './routes/postRoutes.js';
 import authRoutes from './routes/authRoutes.js'; 
@@ -38,6 +40,10 @@ const corsOptions = {
 app.use(cors(corsOptions)); 
 app.use(express.json()); 
 
+// 🌟 NEW: Serve the files in the 'uploads' directory statically.
+// This means any request to /uploads/filename will be served the file from the uploads directory.
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
 // --- API Routes ---
 app.use('/api/categories', categoryRoutes);
 app.use('/api/posts', postRoutes); 
@@ -47,7 +53,7 @@ app.use('/api/comments', commentRoutes);
 // --- MongoDB Connection ---
 const connectDB = async () => {
     try {
-        // FIXED: Using the standard MONGO_URI variable now.
+        // FIXED: Using the standard MONGO_URI variable now.
         await mongoose.connect(process.env.MONGO_URI, {});
         console.log('✅ MongoDB connected successfully!');
     } catch (error) {
@@ -66,13 +72,13 @@ app.use(errorHandler);
 
 // --- Start Server ---
 const startServer = async () => {
-    // Check for MONGO_URI before attempting connection
-    if (!process.env.MONGO_URI) {
-        console.error("❌ Fatal Error: MONGO_URI environment variable is missing.");
-        console.error("Please ensure your .env file is in the root directory and MONGO_URI is defined.");
-        process.exit(1);
-    }
-    
+    // Check for MONGO_URI before attempting connection
+    if (!process.env.MONGO_URI) {
+        console.error("❌ Fatal Error: MONGO_URI environment variable is missing.");
+        console.error("Please ensure your .env file is in the root directory and MONGO_URI is defined.");
+        process.exit(1);
+    }
+    
     // 1. Connect to the Database
     await connectDB();
 
