@@ -1,6 +1,8 @@
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
+// middleware/upload.js
+
+const multer = require('multer'); // CRITICAL FIX: Use require()
+const path = require('path'); // CRITICAL FIX: Use require()
+const fs = require('fs'); // CRITICAL FIX: Use require()
 
 // --- Configuration ---
 
@@ -48,5 +50,7 @@ const upload = multer({
 });
 
 // Export the middleware configured to handle a single file named 'image'
-// This name MUST match the key used in the frontend FormData: formData.append('image', file)
-export const uploadImage = upload.single('image');
+const uploadImage = upload.single('image');
+
+// ⬅️ CRITICAL FIX: Use CommonJS export
+module.exports = { uploadImage };

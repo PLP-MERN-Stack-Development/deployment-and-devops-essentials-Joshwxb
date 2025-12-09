@@ -1,7 +1,8 @@
-import Post from '../models/Post.js'; 
-// Assuming you have a file system utility like 'fs' or 'fs-extra' for potential file deletion
-import fs from 'fs/promises'; 
-import path from 'path';
+// controllers/postController.js
+
+const Post = require('../models/Post'); // CRITICAL FIX: Use require() and remove .js
+const fs = require('fs/promises'); // CRITICAL FIX: Use require()
+const path = require('path'); // CRITICAL FIX: Use require()
 
 // Helper function to resolve the full path to the uploads directory
 const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
@@ -28,7 +29,7 @@ const deleteOldImage = async (imagePath) => {
 };
 
 // --- Create Post Controller ---
-export const createPost = async (req, res, next) => {
+const createPost = async (req, res, next) => { // CHANGED to const
     // NOTE: req.body and req.file are available thanks to Multer middleware
     try {
         // 1. Get data from body and file
@@ -54,14 +55,15 @@ export const createPost = async (req, res, next) => {
     } catch (error) {
         // If save fails after file upload, you should delete the file to prevent orphans
         if (req.file) {
-            await deleteOldImage(req.file.path);
+            // Note: req.file.path is the full file system path which works with deleteOldImage helper
+            await deleteOldImage(req.file.path); 
         }
         next(error);
     }
 };
 
 // --- Update Post Controller ---
-export const updatePost = async (req, res, next) => {
+const updatePost = async (req, res, next) => { // CHANGED to const
     try {
         const { id } = req.params;
 
@@ -120,37 +122,44 @@ export const updatePost = async (req, res, next) => {
 };
 
 // --- Delete Post Controller (Add logic to delete image on deletion) ---
-export const deletePost = async (req, res, next) => {
+const deletePost = async (req, res, next) => { // CHANGED to const
     try {
-        const { id } = req.params;
-        
-        const post = await Post.findById(id);
+        const { id } = req.params;
+        
+        const post = await Post.findById(id);
 
-        if (!post) {
-            return res.status(404).json({ message: 'Post not found' });
-        }
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
 
-        if (post.user.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ message: 'Not authorized to delete this post' });
-        }
-        
-        // 🌟 NEW: Delete the associated image file
+        if (post.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'Not authorized to delete this post' });
+        }
+        
+        // 🌟 NEW: Delete the associated image file
         if (post.imageUrl) {
             await deleteOldImage(post.imageUrl);
         }
-        
-        await Post.findByIdAndDelete(id);
-        
-        res.status(204).send();
-    } catch (error) {
-        if (error.kind === 'ObjectId') {
-            return res.status(400).json({ message: 'Invalid Post ID format' });
-        }
-        next(error);
-    }
+        
+        await Post.findByIdAndDelete(id);
+        
+        res.status(204).send();
+    } catch (error) {
+        if (error.kind === 'ObjectId') {
+            return res.status(400).json({ message: 'Invalid Post ID format' });
+        }
+        next(error);
+    }
 };
 
-// NOTE: You must also export the controllers you use in your routes.
-// Assuming your other controllers like fetchPosts, fetchPostById, etc. are already defined and exported.
-// For completeness, here are the exports used in the routes file:
-// export { createPost, updatePost, deletePost, fetchPosts, fetchPostById, ... };
+// --- Placeholders for other controllers if they exist (must also be converted) ---
+// const fetchPosts = async (req, res, next) => { /* ... logic ... */ };
+// const fetchPostById = async (req, res, next) => { /* ... logic ... */ };
+
+// ⬅️ CRITICAL FIX: Use CommonJS export to export the required functions
+module.exports = { 
+    createPost, 
+    updatePost, 
+    deletePost, 
+    // ... include any other exported functions like fetchPosts, fetchPostById here
+};

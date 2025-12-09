@@ -1,8 +1,8 @@
 // server/routes/commentRoutes.js
 
-import express from 'express'; // Use import instead of require
-import { createComment, getCommentsByPostId } from '../controllers/commentController.js'; // Use import, ensure .js extension
-import { authMiddleware } from '../middleware/authMiddleware.js'; // Use import, ensure .js extension
+const express = require('express'); 
+const { createComment, getCommentsByPostId } = require('../controllers/commentController'); // CRITICAL FIX: Use require() and remove .js
+const { authMiddleware } = require('../middleware/authMiddleware'); // CRITICAL FIX: Use require() and remove .js
 
 const router = express.Router();
 
@@ -12,5 +12,5 @@ router.get('/:postId', getCommentsByPostId);
 // Route to create a new comment (Private access, requires login)
 router.post('/', authMiddleware, createComment);
 
-// Change the export from CommonJS (module.exports) to ES Module (export default)
-export default router;
+// ⬅️ CRITICAL FIX: Use CommonJS export
+module.exports = router;

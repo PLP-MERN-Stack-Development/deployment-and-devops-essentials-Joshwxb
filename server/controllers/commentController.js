@@ -1,14 +1,14 @@
 // server/controllers/commentController.js
 
-import Comment from '../models/Comment.js'; // FIX: Use import with .js extension
-import Post from '../models/Post.js'; // FIX: Use import with .js extension
-import mongoose from 'mongoose'; // FIX: Use import
+const Comment = require('../models/Comment'); // CRITICAL FIX: Use require() and remove .js
+const Post = require('../models/Post'); // CRITICAL FIX: Use require() and remove .js
+const mongoose = require('mongoose'); // CRITICAL FIX: Use require()
 
 // @route   POST /api/comments
 // @desc    Create a new comment on a post
 // @access  Private (Requires authentication)
-export const createComment = async (req, res) => { // FIX: Use export const
-    // req.user.id is set by the authMiddleware
+const createComment = async (req, res) => { // CHANGED to const
+    // req.user._id is set by the authMiddleware
     const { content, postId } = req.body; 
 
     if (!mongoose.Types.ObjectId.isValid(postId)) {
@@ -25,7 +25,7 @@ export const createComment = async (req, res) => { // FIX: Use export const
         // 2. Create the new comment
         const newComment = new Comment({
             content,
-            user: req.user._id, // NOTE: It should be req.user._id if middleware uses select('-password')
+            user: req.user._id, 
             post: postId
         });
 
@@ -45,7 +45,7 @@ export const createComment = async (req, res) => { // FIX: Use export const
 // @route   GET /api/comments/:postId
 // @desc    Get all comments for a specific post
 // @access  Public
-export const getCommentsByPostId = async (req, res) => { // FIX: Use export const
+const getCommentsByPostId = async (req, res) => { // CHANGED to const
     if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
         return res.status(400).json({ message: 'Invalid Post ID' });
     }
@@ -60,4 +60,10 @@ export const getCommentsByPostId = async (req, res) => { // FIX: Use export cons
         console.error(err);
         res.status(500).json({ message: 'Server error' });
     }
+};
+
+// ⬅️ CRITICAL FIX: Use CommonJS export to export multiple functions
+module.exports = { 
+    createComment, 
+    getCommentsByPostId 
 };

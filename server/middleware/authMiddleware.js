@@ -1,11 +1,10 @@
 // server/middleware/authMiddleware.js
 
-import jwt from 'jsonwebtoken';
-import User from '../models/User.js'; 
+const jwt = require('jsonwebtoken'); // CRITICAL FIX: Use require()
+const User = require('../models/User'); // CRITICAL FIX: Use require() and remove .js extension
 
 // Middleware to protect routes (ensure user is logged in)
-// RENAMED from 'protect' to 'authMiddleware' to match how it's imported in commentRoutes.js
-export const authMiddleware = async (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
     let token;
 
     // 1. Check if token exists in headers
@@ -18,6 +17,7 @@ export const authMiddleware = async (req, res, next) => {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
             // 3. Attach user to request object (excluding password)
+            // decoded.id holds the user ID from the JWT payload
             req.user = await User.findById(decoded.id).select('-password');
 
             // 4. Proceed to the next middleware/controller
@@ -26,10 +26,13 @@ export const authMiddleware = async (req, res, next) => {
         } catch (error) {
             console.error('Token verification failed:', error.message);
             // If verification fails (e.g., expired token)
-            res.status(401).json({ message: 'Not authorized, token failed or expired' });
+            return res.status(401).json({ message: 'Not authorized, token failed or expired' });
         }
     } else {
         // If no token is found
-        res.status(401).json({ message: 'Not authorized, no token' });
+        return res.status(401).json({ message: 'Not authorized, no token' });
     }
 };
+
+// ⬅️ CRITICAL FIX: Use CommonJS export
+module.exports = { authMiddleware };

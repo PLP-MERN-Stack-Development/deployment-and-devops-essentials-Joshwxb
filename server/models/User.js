@@ -1,5 +1,6 @@
-import mongoose from 'mongoose';
-import bcrypt from 'bcrypt'; 
+// models/User.js
+const mongoose = require('mongoose'); // CRITICAL FIX: Use require()
+const bcrypt = require('bcryptjs'); // CRITICAL FIX: Use require() and typically bcryptjs for Node compatibility/speed
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -40,13 +41,13 @@ UserSchema.pre('save', function() {
         .then(hash => {
             this.password = hash;
         });
-    // Note: No explicit 'next()' is needed. Mongoose takes the returned promise
-    // and calls 'next' when it resolves, or 'next(err)' when it rejects.
 });
 
 // --- Method to compare passwords (for login) ---
 UserSchema.methods.comparePassword = async function (candidatePassword) {
+    // Note: If you used 'bcrypt', change to 'bcryptjs' require above
     return await bcrypt.compare(candidatePassword, this.password);
 };
 
-export default mongoose.model('User', UserSchema);
+// ⬅️ CRITICAL FIX: Use CommonJS export
+module.exports = mongoose.model('User', UserSchema);

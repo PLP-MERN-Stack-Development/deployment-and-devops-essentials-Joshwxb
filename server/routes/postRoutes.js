@@ -1,9 +1,11 @@
-import express from 'express';
-import Post from '../models/Post.js'; 
-import { authMiddleware } from '../middleware/authMiddleware.js'; 
+// postRoutes.js
+
+const express = require('express');
+const Post = require('../models/Post'); 
+const { authMiddleware } = require('../middleware/authMiddleware'); 
 // 🌟 NEW: Import the Multer upload middleware
-import { uploadImage } from '../middleware/upload.js'; 
-import { createPostValidation, updatePostValidation } from '../middleware/postValidator.js'; 
+const { uploadImage } = require('../middleware/upload'); 
+const { createPostValidation, updatePostValidation } = require('../middleware/postValidator'); 
 const router = express.Router();
 
 // GET /api/posts - Get all blog posts (PUBLIC)
@@ -41,7 +43,6 @@ router.get('/:id', async (req, res, next) => {
 
 
 // POST /api/posts - Create a new blog post (PRIVATE)
-// 🌟 FIX: Insert the uploadImage middleware here. Order is critical: Auth -> Multer -> Validation -> Final Logic
 router.post(
     '/', 
     authMiddleware, 
@@ -105,10 +106,10 @@ router.put(
                 // In a full implementation, you would delete the old file on the server here
                 // (e.g., using fs.unlinkSync(path.join(process.cwd(), post.imageUrl)))
             } else if (req.body.deleteImage === 'true') { 
-                // Handle a separate field from the frontend to explicitly clear the image
-                updateFields.imageUrl = null;
-                // In a full implementation, you would delete the old file on the server here
-            }
+                // Handle a separate field from the frontend to explicitly clear the image
+                updateFields.imageUrl = null;
+                // In a full implementation, you would delete the old file on the server here
+            }
 
             // 3. Update the post
             const updatedPost = await Post.findByIdAndUpdate(
@@ -164,4 +165,4 @@ router.delete('/:id', authMiddleware, async (req, res, next) => {
     }
 });
 
-export default router;
+module.exports = router;

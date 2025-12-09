@@ -1,6 +1,8 @@
-import express from 'express'; // Changed from require
-import { body } from 'express-validator'; // Changed from require
-import { registerUser, loginUser } from '../controllers/authController.js'; // Changed from require, added .js extension
+// authRoutes.js
+const express = require('express'); 
+const { body } = require('express-validator'); 
+const { registerUser, loginUser } = require('../controllers/authController'); // Note: Removed .js extension
+
 const router = express.Router();
 
 // Validation middleware for registration
@@ -29,4 +31,5 @@ router.post('/register', registerValidation, registerUser);
 // @desc    Authenticate user and return JWT
 router.post('/login', loginValidation, loginUser);
 
-export default router; // This ES Module export is correct now
+// ⬅️ CRITICAL FIX: Use CommonJS export
+module.exports = router;

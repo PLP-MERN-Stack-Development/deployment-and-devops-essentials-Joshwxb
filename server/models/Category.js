@@ -1,4 +1,5 @@
-import mongoose from 'mongoose';
+// models/Category.js
+const mongoose = require('mongoose'); // CRITICAL FIX: Use require()
 
 const categorySchema = new mongoose.Schema({
     // Category name is required and must be unique
@@ -21,4 +22,5 @@ const categorySchema = new mongoose.Schema({
 
 const Category = mongoose.model('Category', categorySchema);
 
-export default Category;
+// ⬅️ CRITICAL FIX: Use CommonJS export
+module.exports = Category;

@@ -1,6 +1,8 @@
-import User from '../models/User.js'; // Changed require, added .js extension
-import jwt from 'jsonwebtoken'; // Changed require
-import { validationResult } from 'express-validator'; // Changed require
+// controllers/authController.js
+
+const User = require('../models/User'); // CRITICAL FIX: Use require() and remove .js extension
+const jwt = require('jsonwebtoken'); // CRITICAL FIX: Use require()
+const { validationResult } = require('express-validator'); // CRITICAL FIX: Use require()
 
 // Function to generate a JWT
 const createToken = (id) => {
@@ -12,7 +14,7 @@ const createToken = (id) => {
 // @desc    Register a new user
 // @route   POST /api/auth/register
 // @access  Public
-export const registerUser = async (req, res, next) => { // CHANGED to export const
+const registerUser = async (req, res, next) => { // CHANGED to const
     // 1. Check for validation errors (from router middleware)
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -55,7 +57,7 @@ export const registerUser = async (req, res, next) => { // CHANGED to export con
 // @desc    Authenticate user & get token
 // @route   POST /api/auth/login
 // @access  Public
-export const loginUser = async (req, res, next) => { // CHANGED to export const
+const loginUser = async (req, res, next) => { // CHANGED to const
     const { email, password } = req.body;
 
     try {
@@ -89,4 +91,10 @@ export const loginUser = async (req, res, next) => { // CHANGED to export const
     } catch (error) {
         next(error);
     }
+};
+
+// ⬅️ CRITICAL FIX: Use CommonJS export to export multiple functions
+module.exports = { 
+    registerUser, 
+    loginUser 
 };

@@ -1,5 +1,6 @@
-import express from 'express';
-import Category from '../models/Category.js'; // Import the Category model
+// categoryRoutes.js
+const express = require('express');
+const Category = require('../models/Category'); // CRITICAL FIX: Use require() and remove .js
 
 const router = express.Router();
 
@@ -40,4 +41,5 @@ router.post('/', async (req, res, next) => {
     }
 });
 
-export default router;
+// ⬅️ CRITICAL FIX: Use CommonJS export
+module.exports = router;
