@@ -1,14 +1,17 @@
-import 'dotenv/config'; 
-import express from 'express';
-import mongoose from 'mongoose';
-import cors from 'cors';
-// 🌟 NEW: Import path module for directory management
-import path from 'path'; 
-import categoryRoutes from './routes/categoryRoutes.js';
-import postRoutes from './routes/postRoutes.js';
-import authRoutes from './routes/authRoutes.js'; 
-import commentRoutes from './routes/commentRoutes.js'; 
-import errorHandler from './middleware/errorHandler.js'; 
+// server.js
+// NOTE: dotenv/config must be run first
+require('dotenv/config'); 
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const path = require('path'); 
+
+// ⬅️ CRITICAL FIX: Access the .default property for routes exported as ES Modules
+const categoryRoutes = require('./routes/categoryRoutes').default; 
+const postRoutes = require('./routes/postRoutes').default; 
+const authRoutes = require('./routes/authRoutes').default; 
+const commentRoutes = require('./routes/commentRoutes').default; 
+const errorHandler = require('./middleware/errorHandler').default; // Assuming errorHandler also had a default export
 
 // --- Application Setup ---
 const app = express();
@@ -40,8 +43,7 @@ const corsOptions = {
 app.use(cors(corsOptions)); 
 app.use(express.json()); 
 
-// 🌟 NEW: Serve the files in the 'uploads' directory statically.
-// This means any request to /uploads/filename will be served the file from the uploads directory.
+// 🌟 Serve the files in the 'uploads' directory statically.
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // --- API Routes ---
@@ -53,7 +55,6 @@ app.use('/api/comments', commentRoutes);
 // --- MongoDB Connection ---
 const connectDB = async () => {
     try {
-        // FIXED: Using the standard MONGO_URI variable now.
         await mongoose.connect(process.env.MONGO_URI, {});
         console.log('✅ MongoDB connected successfully!');
     } catch (error) {
