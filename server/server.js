@@ -18,23 +18,33 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// --- CORS Configuration (Correct) ---
+// --- CORS Configuration (Updated to include Vercel URL) ---
 const allowedOrigins = [
-    process.env.CLIENT_URL,
-    'http://localhost:5173', 
+    // 🎯 CRITICAL: Your deployed Vercel frontend URL
+    'https://weblogn.vercel.app', 
+    'http://localhost:5173', // Local development URL
+    // Including the Render backend domain itself is optional but safe:
+    'https://weblog-6vnn.onrender.com' 
 ];
 
 const corsOptions = {
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin) || (origin && origin.endsWith('.onrender.com'))) {
-            callback(null, true);
-        } else {
-            console.log('CORS rejected origin:', origin);
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true, 
+    origin: function (origin, callback) {
+        // Check if origin is undefined (server-to-server or same-origin)
+        // OR if it is in the allowed list
+        // OR if it is any render.com subdomain (safer to check for your client only)
+        const isAllowed = !origin || 
+                          allowedOrigins.includes(origin) || 
+                          (origin && origin.endsWith('.onrender.com'));
+
+        if (isAllowed) {
+            callback(null, true);
+        } else {
+            console.log('CORS rejected origin:', origin);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true, 
 };
 
 // --- Middleware ---
@@ -52,18 +62,18 @@ app.use('/api/comments', commentRoutes);
 
 // --- MongoDB Connection ---
 const connectDB = async () => {
-    try {
-        await mongoose.connect(process.env.MONGO_URI, {});
-        console.log('✅ MongoDB connected successfully!');
-    } catch (error) {
-        console.error('❌ MongoDB connection failed:', error.message);
-        process.exit(1);
-    }
+    try {
+        await mongoose.connect(process.env.MONGO_URI, {});
+        console.log('✅ MongoDB connected successfully!');
+    } catch (error) {
+        console.error('❌ MongoDB connection failed:', error.message);
+        process.exit(1);
+    }
 };
 
 // --- Define Test Route ---
 app.get('/api/test', (req, res) => {
-    res.status(200).json({ message: 'MERN Blog API is running!' });
+    res.status(200).json({ message: 'MERN Blog API is running!' });
 });
 
 // --- Error Handling Middleware (MUST BE LAST) ---
@@ -71,18 +81,18 @@ app.use(errorHandler);
 
 // --- Start Server ---
 const startServer = async () => {
-    if (!process.env.MONGO_URI) {
-        console.error("❌ Fatal Error: MONGO_URI environment variable is missing.");
-        process.exit(1);
-    }
-    
-    await connectDB();
+    if (!process.env.MONGO_URI) {
+        console.error("❌ Fatal Error: MONGO_URI environment variable is missing.");
+        process.exit(1);
+    }
+    
+    await connectDB();
 
-    const HOST = '0.0.0.0'; 
-    app.listen(PORT, HOST, () => {
-        console.log(`📡 Server listening on http://${HOST}:${PORT}`);
-        console.log(`Node Environment: ${process.env.NODE_ENV}`);
-    });
+    const HOST = '0.0.0.0'; 
+    app.listen(PORT, HOST, () => {
+        console.log(`📡 Server listening on http://${HOST}:${PORT}`);
+        console.log(`Node Environment: ${process.env.NODE_ENV}`);
+    });
 };
 
 startServer();
