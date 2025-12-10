@@ -18,10 +18,10 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// --- CORS Configuration (Updated to include Vercel URL) ---
+// --- CORS Configuration (Updated to include NEW Vercel URL) ---
 const allowedOrigins = [
-    // 🎯 CRITICAL: Your deployed Vercel frontend URL
-    'https://weblogn.vercel.app', 
+    // 🎯 CRITICAL FIX: Updated Vercel frontend URL to 'https://weblogv.vercel.app'
+    'https://weblogv.vercel.app', 
     'http://localhost:5173', // Local development URL
     // Including the Render backend domain itself is optional but safe:
     'https://weblog-6vnn.onrender.com' 
