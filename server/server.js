@@ -4,10 +4,8 @@ require('dotenv/config');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-// const path = require('path'); // Path is no longer needed since we removed static file serving
 
-// 🎯 FIX 1: Removed .default property access. 
-// Requires that ALL route files use 'module.exports = router;'
+// ... (other requires remain the same) ...
 const categoryRoutes = require('./routes/categoryRoutes'); 
 const postRoutes = require('./routes/postRoutes'); 
 const authRoutes = require('./routes/authRoutes'); 
@@ -18,25 +16,31 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// --- CORS Configuration (Updated to include NEW Vercel URL) ---
-const allowedOrigins = [
-    // 🎯 Keep your main Vercel URL
+// --- CORS Configuration (Now handles Vercel dynamic URLs) ---
+// We only need to list the primary, static origins here.
+const allowedStaticOrigins = [
+    // Only the main production URL
     'https://weblogn.vercel.app', 
-    // 🎯 CRITICAL FIX: Adding the specific Vercel deployment URL that was previously rejected
-    'weblogn-fnxadbpze-joshs-projects-2ed5b206.vercel.app', 
     'http://localhost:5173', // Local development URL
-    // Including the Render backend domain itself is optional but safe:
-    'https://weblog-6vnn.onrender.com' 
+    'https://weblog-6vnn.onrender.com' // Your Render domain
 ];
 
 const corsOptions = {
     origin: function (origin, callback) {
-        // Check if origin is undefined (server-to-server or same-origin)
-        // OR if it is in the allowed list
-        // OR if it is any render.com subdomain (safer to check for your client only)
-        const isAllowed = !origin || 
-                          allowedOrigins.includes(origin) || 
-                          (origin && origin.endsWith('.onrender.com'));
+        // Check 1: If it's a server-to-server call or undefined
+        const isUndefined = !origin;
+
+        // Check 2: If it's one of the static, allowed origins
+        const isStaticAllowed = allowedStaticOrigins.includes(origin);
+
+        // Check 3 (🎯 NEW PERMANENT FIX): If it's any Vercel domain or Render domain
+        const isDynamicAllowed = origin && (
+             origin.endsWith('.vercel.app') || 
+             origin.endsWith('.onrender.com')
+        );
+
+        // Combine all checks
+        const isAllowed = isUndefined || isStaticAllowed || isDynamicAllowed;
 
         if (isAllowed) {
             callback(null, true);
@@ -52,6 +56,8 @@ const corsOptions = {
 // --- Middleware ---
 app.use(cors(corsOptions)); 
 app.use(express.json()); 
+
+// ... (rest of the file remains the same) ...
 
 // 🎯 FIX 2: REMOVED the static file middleware for local storage, as we are now using Cloudinary.
 // ❌ REMOVED: app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
