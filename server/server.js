@@ -23,7 +23,7 @@ const allowedOrigins = [
     // 🎯 Keep your main Vercel URL
     'https://weblogn.vercel.app', 
     // 🎯 CRITICAL FIX: Adding the specific Vercel deployment URL that was previously rejected
-    'https://weblogn-208b7sog1-joshs-projects-2ed5b206.vercel.app', 
+    'weblogn-l00lpptz6-joshs-projects-2ed5b206.vercel.app', 
     'http://localhost:5173', // Local development URL
     // Including the Render backend domain itself is optional but safe:
     'https://weblog-6vnn.onrender.com' 
