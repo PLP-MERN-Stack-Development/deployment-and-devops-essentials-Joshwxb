@@ -81,16 +81,16 @@ const Home = () => {
       
       {/* 🌟 UPDATED: Footer Element with Icons */}
       <footer style={footerStyle}>
-          <p>&copy; {new Date().getFullYear()} All right reserved weblog.</p>
+          <p>&copy; {new Date().getFullYear()} All right reserved.</p>
           <div style={footerLinksStyle}>
               {/* Note: I'm keeping the original Link targets but using Icons */}
-              <Link to="/twitter" style={footerIconStyle} aria-label="X Twitter Link">
+              <Link to="https://chat.whatsapp.com/IK3Cy47ouwDIh8xwGDYJ5s" style={footerIconStyle} aria-label="X Twitter Link">
                   <FaXTwitter size={24} /> 
               </Link>
-              <Link to="/instagram" style={footerIconStyle} aria-label="Instagram Link">
+              <Link to="https://chat.whatsapp.com/IK3Cy47ouwDIh8xwGDYJ5s" style={footerIconStyle} aria-label="Instagram Link">
                   <FaInstagram size={24} />
               </Link>
-              <Link to="/tiktok" style={footerIconStyle} aria-label="Tiktok Link">
+              <Link to="https://chat.whatsapp.com/IK3Cy47ouwDIh8xwGDYJ5s" style={footerIconStyle} aria-label="Tiktok Link">
                   <FaTiktok size={24} />
               </Link>
           </div>

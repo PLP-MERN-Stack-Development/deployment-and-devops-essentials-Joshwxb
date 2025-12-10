@@ -1,13 +1,14 @@
 import axios from 'axios';
 
 // Get the base URL from the environment variables (Vite-specific import method)
-// The value of this variable is the clean Render domain: https://weblog-6vnn.onrender.com
+// 🎯 FIX: Changed variable name from VITE_API_BASE_URL to the correct VITE_BACKEND_URL.
+// The value of this variable is the full Render domain: https://weblog-6vnn.onrender.com (without /api)
 const RENDER_BASE_URL = import.meta.env.VITE_BACKEND_URL; 
 const API_BASE_URL = RENDER_BASE_URL || '/api'; // Fallback to '/api' for local dev proxy
 
 // 1. Create the base Axios instance
 const api = axios.create({
-    // baseURL is set to the Render URL (https://weblog-6vnn.onrender.com)
+    // FIX: baseURL is now correctly set to the full Render URL when deployed.
     baseURL: API_BASE_URL, 
     headers: {
         // Default Content-Type for all requests
@@ -58,12 +59,13 @@ const handleAxiosError = (error) => {
     return Promise.reject(new Error(message));
 };
 
-// --- AUTHENTICATION API CALLS ---
+// --- AUTHENTICATION API CALLS (NEW) ---
 
 export const registerUser = async (userData) => {
     try {
-        // FIX: Added /api prefix
-        const response = await api.post('/api/auth/register', userData);
+        // Path is now correctly appended to the Render URL: 
+        // https://render-url + /auth/register
+        const response = await api.post('/auth/register', userData);
         return response.data;
     } catch (error) {
         return handleAxiosError(error);
@@ -72,20 +74,18 @@ export const registerUser = async (userData) => {
 
 export const loginUser = async (credentials) => {
     try {
-        // FIX: Added /api prefix
-        const response = await api.post('/api/auth/login', credentials);
+        const response = await api.post('/auth/login', credentials);
         return response.data;
     } catch (error) {
         return handleAxiosError(error);
     }
 };
 
-// --- POSTS API CALLS ---
+// --- POSTS API CALLS (UPDATED for File Upload) ---
 
 export const fetchPosts = async () => {
     try {
-        // FIX: Added /api prefix
-        const response = await api.get('/api/posts');
+        const response = await api.get('/posts');
         return response.data;
     } catch (error) {
         return handleAxiosError(error);
@@ -94,8 +94,7 @@ export const fetchPosts = async () => {
 
 export const fetchPostById = async (id) => {
     try {
-        // FIX: Added /api prefix
-        const response = await api.get(`/api/posts/${id}`);
+        const response = await api.get(`/posts/${id}`);
         return response.data;
     } catch (error) {
         return handleAxiosError(error);
@@ -105,8 +104,7 @@ export const fetchPostById = async (id) => {
 // 🌟 CHANGE: We pass a config object to override the Content-Type
 export const createPost = async (postData) => {
     try {
-        // FIX: Added /api prefix
-        const response = await api.post('/api/posts', postData, {
+        const response = await api.post('/posts', postData, {
             headers: {
                 'Content-Type': undefined, // Forces Axios to set multipart/form-data when FormData is detected
             },
@@ -120,8 +118,7 @@ export const createPost = async (postData) => {
 // 🌟 CHANGE: We pass a config object to override the Content-Type
 export const updatePost = async (id, postData) => {
     try {
-        // FIX: Added /api prefix
-        const response = await api.put(`/api/posts/${id}`, postData, {
+        const response = await api.put(`/posts/${id}`, postData, {
             headers: {
                 'Content-Type': undefined, // Forces Axios to set multipart/form-data when FormData is detected
             },
@@ -134,32 +131,29 @@ export const updatePost = async (id, postData) => {
 
 export const deletePost = async (id) => {
     try {
-        // FIX: Added /api prefix
-        const response = await api.delete(`/api/posts/${id}`);
+        const response = await api.delete(`/posts/${id}`);
         return response.data;
     } catch (error) {
         return handleAxiosError(error);
     }
 };
 
-// --- CATEGORIES API CALLS ---
+// --- CATEGORIES API CALLS (UPDATED to use the 'api' instance) ---
 
 export const fetchCategories = async () => {
     try {
-        // FIX: Added /api prefix
-        const response = await api.get('/api/categories');
+        const response = await api.get('/categories');
         return response.data;
     } catch (error) {
         return handleAxiosError(error);
     }
 };
 
-// --- COMMENTS API CALLS ---
+// --- COMMENTS API CALLS (NEW FEATURE) ---
 
 export const fetchComments = async (postId) => {
     try {
-        // FIX: Added /api prefix
-        const response = await api.get(`/api/comments/${postId}`);
+        const response = await api.get(`/comments/${postId}`);
         return response.data;
     } catch (error) {
         return handleAxiosError(error);
@@ -168,8 +162,8 @@ export const fetchComments = async (postId) => {
 
 export const createComment = async (postId, content) => {
     try {
-        // FIX: Added /api prefix
-        const response = await api.post(`/api/comments`, { postId, content });
+        // The interceptor will automatically add the token, we just send the required body.
+        const response = await api.post(`/comments`, { postId, content });
         return response.data;
     } catch (error) {
         return handleAxiosError(error);
