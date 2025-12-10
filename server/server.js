@@ -20,8 +20,10 @@ const PORT = process.env.PORT || 5000;
 
 // --- CORS Configuration (Updated to include NEW Vercel URL) ---
 const allowedOrigins = [
-    // 🎯 CRITICAL FIX: Updated Vercel frontend URL to 'https://weblogn.vercel.app'
+    // 🎯 Keep your main Vercel URL
     'https://weblogn.vercel.app', 
+    // 🎯 CRITICAL FIX: Adding the specific Vercel deployment URL that was previously rejected
+    'https://weblogn-208b7sog1-joshs-projects-2ed5b206.vercel.app', 
     'http://localhost:5173', // Local development URL
     // Including the Render backend domain itself is optional but safe:
     'https://weblog-6vnn.onrender.com' 
