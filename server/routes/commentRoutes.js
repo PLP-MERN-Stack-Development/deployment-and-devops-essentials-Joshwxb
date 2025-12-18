@@ -1,8 +1,11 @@
 // server/routes/commentRoutes.js
 
 const express = require('express'); 
-const { createComment, getCommentsByPostId } = require('../controllers/commentController'); // CRITICAL FIX: Use require() and remove .js
-const { authMiddleware } = require('../middleware/authMiddleware'); // CRITICAL FIX: Use require() and remove .js
+// Ensure these names match what is exported in commentController.js
+const { createComment, getCommentsByPostId } = require('../controllers/commentController'); 
+
+// 🎯 FIX: Updated to import { protect } instead of authMiddleware
+const { protect } = require('../middleware/authMiddleware'); 
 
 const router = express.Router();
 
@@ -10,7 +13,8 @@ const router = express.Router();
 router.get('/:postId', getCommentsByPostId);
 
 // Route to create a new comment (Private access, requires login)
-router.post('/', authMiddleware, createComment);
+// 🎯 FIX: Changed 'authMiddleware' to 'protect'
+router.post('/', protect, createComment);
 
 // ⬅️ CRITICAL FIX: Use CommonJS export
 module.exports = router;

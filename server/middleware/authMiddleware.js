@@ -1,10 +1,8 @@
-// server/middleware/authMiddleware.js
-
-const jwt = require('jsonwebtoken'); // CRITICAL FIX: Use require()
-const User = require('../models/User'); // CRITICAL FIX: Use require() and remove .js extension
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
 // Middleware to protect routes (ensure user is logged in)
-const authMiddleware = async (req, res, next) => {
+const protect = async (req, res, next) => {
     let token;
 
     // 1. Check if token exists in headers
@@ -25,7 +23,6 @@ const authMiddleware = async (req, res, next) => {
 
         } catch (error) {
             console.error('Token verification failed:', error.message);
-            // If verification fails (e.g., expired token)
             return res.status(401).json({ message: 'Not authorized, token failed or expired' });
         }
     } else {
@@ -34,5 +31,5 @@ const authMiddleware = async (req, res, next) => {
     }
 };
 
-// ⬅️ CRITICAL FIX: Use CommonJS export
-module.exports = { authMiddleware };
+// 🎯 Exported as 'protect' to match your routes
+module.exports = { protect };

@@ -5,83 +5,72 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
-// ... (other requires remain the same) ...
+// --- Route Imports ---
 const categoryRoutes = require('./routes/categoryRoutes'); 
 const postRoutes = require('./routes/postRoutes'); 
 const authRoutes = require('./routes/authRoutes'); 
 const commentRoutes = require('./routes/commentRoutes'); 
+const notificationRoutes = require('./routes/notificationRoutes'); // 🎯 NEW: Import notification routes
 const errorHandler = require('./middleware/errorHandler'); 
 
 // --- Application Setup ---
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// --- CORS Configuration (Now handles Vercel dynamic URLs) ---
-// We only need to list the primary, static origins here.
+// --- CORS Configuration (Handles Vercel dynamic URLs) ---
 const allowedStaticOrigins = [
-    // Only the main production URL
-    'https://weblogn.vercel.app', 
-    'http://localhost:5173', // Local development URL
-    'https://weblog-6vnn.onrender.com' // Your Render domain
+    'https://weblogn.vercel.app', 
+    'http://localhost:5173', 
+    'https://weblog-6vnn.onrender.com'
 ];
 
 const corsOptions = {
-    origin: function (origin, callback) {
-        // Check 1: If it's a server-to-server call or undefined
-        const isUndefined = !origin;
-
-        // Check 2: If it's one of the static, allowed origins
-        const isStaticAllowed = allowedStaticOrigins.includes(origin);
-
-        // Check 3 (🎯 NEW PERMANENT FIX): If it's any Vercel domain or Render domain
-        const isDynamicAllowed = origin && (
+    origin: function (origin, callback) {
+        const isUndefined = !origin;
+        const isStaticAllowed = allowedStaticOrigins.includes(origin);
+        const isDynamicAllowed = origin && (
              origin.endsWith('.vercel.app') || 
              origin.endsWith('.onrender.com')
         );
 
-        // Combine all checks
-        const isAllowed = isUndefined || isStaticAllowed || isDynamicAllowed;
+        const isAllowed = isUndefined || isStaticAllowed || isDynamicAllowed;
 
-        if (isAllowed) {
-            callback(null, true);
-        } else {
-            console.log('CORS rejected origin:', origin);
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true, 
+        if (isAllowed) {
+            callback(null, true);
+        } else {
+            console.log('CORS rejected origin:', origin);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true, 
 };
 
 // --- Middleware ---
 app.use(cors(corsOptions)); 
 app.use(express.json()); 
 
-// ... (rest of the file remains the same) ...
-
-// 🎯 FIX 2: REMOVED the static file middleware for local storage, as we are now using Cloudinary.
-// ❌ REMOVED: app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
-
 // --- API Routes ---
 app.use('/api/categories', categoryRoutes);
 app.use('/api/posts', postRoutes); 
 app.use('/api/auth', authRoutes); 
 app.use('/api/comments', commentRoutes); 
+app.use('/api/notifications', notificationRoutes); // 🎯 NEW: Add notifications route
 
 // --- MongoDB Connection ---
 const connectDB = async () => {
-    try {
-        await mongoose.connect(process.env.MONGO_URI, {});
-        console.log('✅ MongoDB connected successfully!');
-    } catch (error) {
-        console.error('❌ MongoDB connection failed:', error.message);
-        process.exit(1);
-    }
+    try {
+        await mongoose.connect(process.env.MONGO_URI, {});
+        console.log('✅ MongoDB connected successfully!');
+    } catch (error) {
+        console.error('❌ MongoDB connection failed:', error.message);
+        process.exit(1);
+    }
 };
 
 // --- Define Test Route ---
 app.get('/api/test', (req, res) => {
-    res.status(200).json({ message: 'MERN Blog API is running!' });
+    res.status(200).json({ message: 'MERN Blog API is running!' });
 });
 
 // --- Error Handling Middleware (MUST BE LAST) ---
@@ -89,18 +78,17 @@ app.use(errorHandler);
 
 // --- Start Server ---
 const startServer = async () => {
-    if (!process.env.MONGO_URI) {
-        console.error("❌ Fatal Error: MONGO_URI environment variable is missing.");
-        process.exit(1);
-    }
-    
-    await connectDB();
+    if (!process.env.MONGO_URI) {
+        console.error("❌ Fatal Error: MONGO_URI environment variable is missing.");
+        process.exit(1);
+    }
+    
+    await connectDB();
 
-    const HOST = '0.0.0.0'; 
-    app.listen(PORT, HOST, () => {
-        console.log(`📡 Server listening on http://${HOST}:${PORT}`);
-        console.log(`Node Environment: ${process.env.NODE_ENV}`);
-    });
+    const HOST = '0.0.0.0'; 
+    app.listen(PORT, HOST, () => {
+        console.log(`📡 Server listening on http://${HOST}:${PORT}`);
+    });
 };
 
 startServer();

@@ -1,6 +1,6 @@
-import React, { useContext } from 'react'; // NEW: Import useContext
-import { Routes, Route, Navigate } from 'react-router-dom'; // NEW: Import Navigate
-import { AuthContext } from './context/AuthContext'; // NEW: Import AuthContext
+import React, { useContext } from 'react'; 
+import { Routes, Route, Navigate } from 'react-router-dom'; 
+import { AuthContext } from './context/AuthContext'; 
 import Header from "./components/Header.jsx";
 import Home from './pages/Home.jsx'; 
 import PostDetail from './pages/PostDetail.jsx'; 
@@ -10,30 +10,32 @@ import Register from './pages/Register.jsx';
 import './index.css';
 
 function App() {
-    const { user } = useContext(AuthContext); // NEW: Get user state from context
+    const { user } = useContext(AuthContext); 
 
     return (
-        // NOTE: Assuming <BrowserRouter> is correctly wrapping App in main.jsx
         <>
             <Header />
             <main style={{ padding: '0 20px' }}>
                 <Routes>
                     {/* Public Routes */}
                     <Route path="/" element={<Home />} /> 
+                    
+                    {/* 🎯 Support both singular and plural paths to prevent 404s */}
+                    <Route path="/post/:id" element={<PostDetail />} /> 
                     <Route path="/posts/:id" element={<PostDetail />} /> 
                     
                     {/* Authentication Routes (Public) */}
                     <Route path="/login" element={<Login />} /> 
                     <Route path="/register" element={<Register />} /> 
                     
-                    {/* SECURED ROUTES: Only accessible if user is logged in */}
+                    {/* SECURED ROUTES */}
                     <Route 
                         path="/create" 
-                        element={user ? <PostForm /> : <Navigate to="/login" />} // PROTECTION APPLIED
+                        element={user ? <PostForm /> : <Navigate to="/login" />} 
                     /> 
                     <Route 
                         path="/edit/:id" 
-                        element={user ? <PostForm /> : <Navigate to="/login" />} // PROTECTION APPLIED
+                        element={user ? <PostForm /> : <Navigate to="/login" />} 
                     /> 
                     
                     {/* 404 Route */}

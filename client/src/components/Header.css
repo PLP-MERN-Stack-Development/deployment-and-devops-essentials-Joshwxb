@@ -1,53 +1,148 @@
-.main-header {
-  background: #20232a; /* Dark background */
+/* --- Main Layout --- */
+.navbar {
+  background: #20232a;
   color: #fff;
-  padding: 15px 40px;
+  padding: 10px 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  min-height: 70px;
 }
 
-.header-title {
-    font-size: 1.8em;
-    font-weight: 600;
-    margin: 0;
-    color: #61dafb; /* React blue/cyan color */
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.6em;
+  font-weight: 600;
+  text-decoration: none;
+  color: #61dafb;
+  flex-shrink: 0;
 }
 
-.main-header nav a {
+.navbar-logo-img {
+  height: 35px;
+  width: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.nav-actions {
+  flex-shrink: 0;
+  z-index: 1001;
+}
+
+/* --- Navigation Links --- */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-left: auto;
+  margin-right: 20px;
+}
+
+.nav-item {
   color: #fff;
   text-decoration: none;
-  padding: 0 15px;
+  padding: 0 10px;
   transition: color 0.3s;
   font-weight: 500;
   font-size: 1.1em;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
-.main-header nav a:hover {
-  color: #61dafb;
-}
-/* ... existing styles ... */
+.nav-item:hover { color: #61dafb; }
+.nav-user-text { color: #61dafb; font-weight: 500; }
 
-.header-user {
-    color: #61dafb; /* React blue/cyan color */
-    font-weight: 500;
-    margin-right: 20px;
-    font-size: 1.1em;
-}
-
-.header-logout-button {
-    background-color: #dc3545; /* Red for emphasis */
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    font-weight: 500;
-    transition: background-color 0.2s;
-    font-size: 1em;
+.nav-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-weight: 500;
+  transition: background-color 0.2s;
 }
 
-.header-logout-button:hover {
-    background-color: #c82333;
+.nav-button:hover { background-color: #c82333; }
+
+/* --- Hamburger Icon --- */
+.hamburger {
+  display: none; /* Hidden by default */
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.bar {
+  width: 25px;
+  height: 3px;
+  background-color: #fff;
+  transition: 0.3s;
+  border-radius: 2px;
+}
+
+/* --- Responsive Switch Logic --- */
+
+/* 💻 PC View (769px and up) */
+@media (min-width: 769px) {
+    .hamburger {
+        display: none !important; /* Force hide on PC */
+    }
+    .nav-actions {
+        order: 2; 
+        margin-left: 15px;
+        margin-right: 15px;
+    }
+    .nav-links {
+        order: 3;
+        margin-left: 0;
+    }
+}
+
+/* 📱 Mobile View (768px and down) */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 10px 20px;
+  }
+
+  .hamburger {
+    display: flex; /* Show only on mobile */
+  }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    background-color: #20232a;
+    padding: 20px 0;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+
+  .nav-links.active {
+    display: flex;
+  }
+
+  .nav-item {
+    padding: 15px 0;
+    width: 100%;
+    display: block;
+  }
+}
+
+.notification-container {
+    width: auto !important;
+    display: inline-flex !important;
 }
