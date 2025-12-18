@@ -76,10 +76,10 @@ const NotificationBell = () => {
             >
                 <Bell 
                     size={24} 
-                    color="#61dafb" 
-                    fill={unreadCount > 0 ? "#61dafb" : "none"} 
+                    color="#3982ccff" 
+                    fill={unreadCount > 0 ? "#3e89d4ff" : "none"} 
                     style={{
-                        filter: isHovered ? 'drop-shadow(0 0 8px rgba(97, 218, 251, 0.6))' : 'none',
+                        filter: isHovered ? 'drop-shadow(0 0 8px #007bff' : 'none',
                         transition: 'filter 0.3s ease'
                     }}
                 />
@@ -134,7 +134,7 @@ const NotificationBell = () => {
                         backgroundColor: '#f8f9fa'
                     }}>
                         <span style={{ fontWeight: '700', fontSize: '15px' }}>Notifications</span>
-                        <span style={{ fontSize: '12px', color: '#61dafb', fontWeight: '600' }}>
+                        <span style={{ fontSize: '12px', color: '#007bff', fontWeight: '600' }}>
                             {unreadCount} New
                         </span>
                     </div>
@@ -168,7 +168,7 @@ const NotificationBell = () => {
                                             <p style={{ margin: '0 0 4px 0', fontSize: '13px', lineHeight: '1.4' }}>
                                                 <strong style={{ color: '#2f3542' }}>{n.sender?.username}</strong>
                                                 <span style={{ color: '#57606f' }}> commented on </span>
-                                                <span style={{ fontWeight: '600', color: '#61dafb' }}>{n.post?.title}</span>
+                                                <span style={{ fontWeight: '600', color: '#007bff' }}>{n.post?.title}</span>
                                             </p>
                                         </Link>
                                     </div>
