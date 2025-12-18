@@ -1,20 +1,45 @@
 // server/routes/commentRoutes.js
 
 const express = require('express'); 
-// Ensure these names match what is exported in commentController.js
-const { createComment, getCommentsByPostId } = require('../controllers/commentController'); 
+// 🎯 Added updateComment and deleteComment to the imports
+const { 
+    createComment, 
+    getCommentsByPostId, 
+    updateComment, 
+    deleteComment 
+} = require('../controllers/commentController'); 
 
-// 🎯 FIX: Updated to import { protect } instead of authMiddleware
 const { protect } = require('../middleware/authMiddleware'); 
 
 const router = express.Router();
 
-// Route to fetch comments for a post (Public access)
+/**
+ * @route   GET /api/comments/:postId
+ * @desc    Fetch all comments for a specific post
+ * @access  Public
+ */
 router.get('/:postId', getCommentsByPostId);
 
-// Route to create a new comment (Private access, requires login)
-// 🎯 FIX: Changed 'authMiddleware' to 'protect'
+/**
+ * @route   POST /api/comments
+ * @desc    Create a new comment
+ * @access  Private
+ */
 router.post('/', protect, createComment);
 
-// ⬅️ CRITICAL FIX: Use CommonJS export
+/**
+ * @route   PUT /api/comments/:id
+ * @desc    Update an existing comment (Only by the author)
+ * @access  Private
+ */
+router.put('/:id', protect, updateComment);
+
+/**
+ * @route   DELETE /api/comments/:id
+ * @desc    Delete a comment (Only by the author)
+ * @access  Private
+ */
+router.delete('/:id', protect, deleteComment);
+
+// ⬅️ Exporting the router using CommonJS
 module.exports = router;

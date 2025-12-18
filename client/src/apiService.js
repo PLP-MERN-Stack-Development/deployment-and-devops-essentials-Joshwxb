@@ -151,6 +151,26 @@ export const createComment = async (postId, content) => {
     }
 };
 
+/** 🎯 NEW: Update an existing comment */
+export const updateComment = async (id, content) => {
+    try {
+        const response = await api.put(`/comments/${id}`, { content });
+        return response.data;
+    } catch (error) {
+        return handleAxiosError(error);
+    }
+};
+
+/** 🎯 NEW: Delete a comment */
+export const deleteComment = async (id) => {
+    try {
+        const response = await api.delete(`/comments/${id}`);
+        return response.data;
+    } catch (error) {
+        return handleAxiosError(error);
+    }
+};
+
 // --- NOTIFICATIONS API CALLS ---
 
 export const fetchNotifications = async () => {
@@ -171,7 +191,6 @@ export const markNotificationRead = async (id) => {
     }
 };
 
-/** 🎯 NEW: Delete a single notification */
 export const deleteNotification = async (id) => {
     try {
         const response = await api.delete(`/notifications/${id}`);

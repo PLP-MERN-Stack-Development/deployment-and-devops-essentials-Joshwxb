@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 
 // @route   POST /api/comments
 // @desc    Create a new comment on a post
-// @access  Private (Requires authentication)
+// @access  Private
 const createComment = async (req, res) => {
     const { content, postId } = req.body; 
 
@@ -16,13 +16,11 @@ const createComment = async (req, res) => {
     }
 
     try {
-        // 1. Check if the post exists
         const postExists = await Post.findById(postId);
         if (!postExists) {
             return res.status(404).json({ message: 'Post not found' });
         }
 
-        // 2. Create the new comment
         const newComment = new Comment({
             content,
             user: req.user._id, 
@@ -30,40 +28,31 @@ const createComment = async (req, res) => {
         });
 
         const comment = await newComment.save();
-        
-        // 3. Populate the user data to return a complete comment object
         await comment.populate('user', 'username'); 
 
-        // 🎯 4. NOTIFICATION LOGIC: Notify the post creator
-        // NOTE: We use 'postExists.user' because that is the field name in your Post model
+        // 🎯 NOTIFICATION LOGIC
         const postCreatorId = postExists.user;
-
         if (postCreatorId && postCreatorId.toString() !== req.user._id.toString()) {
             try {
                 await Notification.create({
-                    recipient: postCreatorId, // The owner of the blog post
-                    sender: req.user._id,     // The person who commented
+                    recipient: postCreatorId,
+                    sender: req.user._id,
                     post: postId,
                     type: 'comment'
                 });
-                console.log('✅ Notification created successfully');
             } catch (notificationError) {
-                // We log the error but don't fail the comment request
-                console.error('Notification failed to create:', notificationError);
+                console.error('Notification failed:', notificationError);
             }
         }
 
         res.status(201).json(comment);
-
     } catch (err) {
-        console.error('Comment creation error:', err);
         res.status(500).json({ message: 'Server error while creating comment' });
     }
 };
 
 // @route   GET /api/comments/:postId
 // @desc    Get all comments for a specific post
-// @access  Public
 const getCommentsByPostId = async (req, res) => { 
     if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
         return res.status(400).json({ message: 'Invalid Post ID' });
@@ -73,15 +62,64 @@ const getCommentsByPostId = async (req, res) => {
         const comments = await Comment.find({ post: req.params.postId })
             .populate('user', 'username') 
             .sort({ createdAt: 1 }); 
-
         res.json(comments);
     } catch (err) {
-        console.error('Fetch comments error:', err);
         res.status(500).json({ message: 'Server error while fetching comments' });
+    }
+};
+
+// @route   PUT /api/comments/:id
+// @desc    Update an existing comment
+// @access  Private (Author only)
+const updateComment = async (req, res) => {
+    try {
+        const comment = await Comment.findById(req.params.id);
+
+        if (!comment) {
+            return res.status(404).json({ message: 'Comment not found' });
+        }
+
+        // 🛡️ SECURITY: Verify Ownership
+        if (comment.user.toString() !== req.user._id.toString()) {
+            return res.status(401).json({ message: 'Not authorized to edit this comment' });
+        }
+
+        comment.content = req.body.content || comment.content;
+        const updatedComment = await comment.save();
+        await updatedComment.populate('user', 'username');
+
+        res.json(updatedComment);
+    } catch (err) {
+        res.status(500).json({ message: 'Server error while updating comment' });
+    }
+};
+
+// @route   DELETE /api/comments/:id
+// @desc    Delete a comment
+// @access  Private (Author only)
+const deleteComment = async (req, res) => {
+    try {
+        const comment = await Comment.findById(req.params.id);
+
+        if (!comment) {
+            return res.status(404).json({ message: 'Comment not found' });
+        }
+
+        // 🛡️ SECURITY: Verify Ownership
+        if (comment.user.toString() !== req.user._id.toString()) {
+            return res.status(401).json({ message: 'Not authorized to delete this comment' });
+        }
+
+        await comment.deleteOne();
+        res.json({ message: 'Comment deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error while deleting comment' });
     }
 };
 
 module.exports = { 
     createComment, 
-    getCommentsByPostId 
+    getCommentsByPostId,
+    updateComment,
+    deleteComment
 };
