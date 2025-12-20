@@ -33,13 +33,12 @@ const Header = () => {
                 WEBLOG
             </Link>
 
-            {/* 🎯 2. ACTION AREA (Notification + Hamburger) */}
+            {/* 2. ACTION AREA (Notification + Hamburger only) */}
             <div className="nav-actions" style={{ 
                 display: 'flex', 
                 flexDirection: 'row', 
                 alignItems: 'center', 
                 gap: '12px', 
-                flexWrap: 'nowrap',
                 marginLeft: 'auto' 
             }}>
                 {isAuthenticated && (
@@ -48,7 +47,6 @@ const Header = () => {
                     </div>
                 )}
                 
-                {/* 🎯 Removed inline display:flex so CSS can hide it on PC */}
                 <button 
                     className={`hamburger ${isMenuOpen ? 'open' : ''}`} 
                     onClick={toggleMenu}
@@ -70,9 +68,13 @@ const Header = () => {
                         <Link to="/create" className="nav-item" onClick={() => handleNavigationClick('/create')}>
                             Create Post
                         </Link>
-                        <span className="nav-item nav-user-text">
-                            Hello, {user?.username || user?.email}! 
-                        </span> 
+                        
+                        <Link to="/profile" className="nav-item" onClick={() => handleNavigationClick('/profile')}>
+                            Profile
+                        </Link>
+
+                        {/* 🎯 GREETING REMOVED FROM HERE AS REQUESTED */}
+
                         <button onClick={handleLogout} className="nav-item nav-button">
                             Logout
                         </button>

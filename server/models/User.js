@@ -1,6 +1,5 @@
-// models/User.js
-const mongoose = require('mongoose'); // CRITICAL FIX: Use require()
-const bcrypt = require('bcryptjs'); // CRITICAL FIX: Use require() and typically bcryptjs for Node compatibility/speed
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -21,6 +20,21 @@ const UserSchema = new mongoose.Schema({
         required: [true, 'Password is required'],
         minlength: [6, 'Password must be at least 6 characters long']
     },
+    // 🎯 NEW PROFILE FIELDS
+    profilePicture: {
+        type: String,
+        default: '' // Will store the URL/Path to the image
+    },
+    bio: {
+        type: String,
+        maxlength: [200, 'Bio cannot be more than 200 characters'],
+        default: ''
+    },
+    socials: {
+        twitter: { type: String, default: '' },
+        instagram: { type: String, default: '' },
+        tiktok: { type: String, default: '' }
+    },
     createdAt: {
         type: Date,
         default: Date.now
@@ -28,26 +42,25 @@ const UserSchema = new mongoose.Schema({
 });
 
 // --- Mongoose Middleware: Hash Password Before Saving ---
-// FINAL FIX: Return the promise chain. Mongoose handles the success/error flow automatically.
-UserSchema.pre('save', function() { 
-    // If password hasn't changed, skip hashing and return a resolved promise.
+// 🛠️ FIX: Using async/await and passing 'next' for more reliable execution
+UserSchema.pre('save', async function(next) { 
     if (!this.isModified('password')) {
-        return Promise.resolve(); 
+        return next(); 
     }
     
-    // Hash the password using the promise chain and RETURN it.
-    return bcrypt.genSalt(10)
-        .then(salt => bcrypt.hash(this.password, salt))
-        .then(hash => {
-            this.password = hash;
-        });
+    try {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
+    } catch (error) {
+        next(error);
+    }
 });
 
 // --- Method to compare passwords (for login) ---
 UserSchema.methods.comparePassword = async function (candidatePassword) {
-    // Note: If you used 'bcrypt', change to 'bcryptjs' require above
     return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// ⬅️ CRITICAL FIX: Use CommonJS export
+// 🎯 CRITICAL: This 'User' string MUST match the 'ref' in Post.js
 module.exports = mongoose.model('User', UserSchema);

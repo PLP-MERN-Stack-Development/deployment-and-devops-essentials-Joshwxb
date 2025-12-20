@@ -2,10 +2,8 @@
 
 const express = require('express');
 const Post = require('../models/Post'); 
-// 🎯 FIX 1: Updated to use { protect } to match our authMiddleware.js export
 const { protect } = require('../middleware/authMiddleware'); 
-// 🎯 FIX 2: Ensure this matches your specific upload middleware export
-const uploadImage = require('../middleware/upload'); 
+const uploadImage = require('../middleware/upload'); // 🎯 This is now the Multer instance
 const { createPostValidation, updatePostValidation } = require('../middleware/postValidator'); 
 const router = express.Router();
 
@@ -26,11 +24,9 @@ router.get('/', async (req, res, next) => {
 router.get('/:id', async (req, res, next) => {
     try {
         const { id } = req.params;
-        
-        // Populate category and user data
         const post = await Post.findById(id)
             .populate('category', 'name')
-            .populate('user', 'username'); // 🎯 Tip: populate username for the frontend
+            .populate('user', 'username'); 
 
         if (!post) {
             return res.status(404).json({ message: 'Post not found' });
@@ -49,8 +45,8 @@ router.get('/:id', async (req, res, next) => {
 // POST /api/posts - Create a new blog post (PRIVATE)
 router.post(
     '/', 
-    protect, // 🎯 Updated from authMiddleware to protect
-    uploadImage, 
+    protect, 
+    uploadImage.single('image'), // 🎯 FIX: Added .single('image')
     createPostValidation, 
     async (req, res, next) => { 
         try {
@@ -76,8 +72,8 @@ router.post(
 // PUT /api/posts/:id - Update an existing blog post (PRIVATE)
 router.put(
     '/:id', 
-    protect, // 🎯 Updated from authMiddleware to protect
-    uploadImage, 
+    protect, 
+    uploadImage.single('image'), // 🎯 FIX: Added .single('image')
     updatePostValidation, 
     async (req, res, next) => { 
         try {
@@ -88,7 +84,6 @@ router.put(
                 return res.status(404).json({ message: 'Post not found' });
             }
 
-            // AUTHORIZATION CHECK
             if (post.user.toString() !== req.user._id.toString()) {
                 return res.status(403).json({ message: 'Not authorized to update this post' });
             }
@@ -118,7 +113,7 @@ router.put(
 );
 
 // DELETE /api/posts/:id - Delete a blog post (PRIVATE)
-router.delete('/:id', protect, async (req, res, next) => { // 🎯 Updated to protect
+router.delete('/:id', protect, async (req, res, next) => { 
     try {
         const { id } = req.params;
         const post = await Post.findById(id);

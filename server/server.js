@@ -10,14 +10,15 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const postRoutes = require('./routes/postRoutes'); 
 const authRoutes = require('./routes/authRoutes'); 
 const commentRoutes = require('./routes/commentRoutes'); 
-const notificationRoutes = require('./routes/notificationRoutes'); // 🎯 NEW: Import notification routes
+const notificationRoutes = require('./routes/notificationRoutes'); 
+const userRoutes = require('./routes/userRoutes'); // 🎯 User/Profile routes
 const errorHandler = require('./middleware/errorHandler'); 
 
 // --- Application Setup ---
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// --- CORS Configuration (Handles Vercel dynamic URLs) ---
+// --- CORS Configuration ---
 const allowedStaticOrigins = [
     'https://weblogn.vercel.app', 
     'http://localhost:5173', 
@@ -49,13 +50,16 @@ const corsOptions = {
 // --- Middleware ---
 app.use(cors(corsOptions)); 
 app.use(express.json()); 
+// If you ever need to handle standard form-data (non-file), this is helpful:
+app.use(express.urlencoded({ extended: true }));
 
 // --- API Routes ---
 app.use('/api/categories', categoryRoutes);
 app.use('/api/posts', postRoutes); 
 app.use('/api/auth', authRoutes); 
 app.use('/api/comments', commentRoutes); 
-app.use('/api/notifications', notificationRoutes); // 🎯 NEW: Add notifications route
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/users', userRoutes); // 🎯 User/Profile routes registered
 
 // --- MongoDB Connection ---
 const connectDB = async () => {

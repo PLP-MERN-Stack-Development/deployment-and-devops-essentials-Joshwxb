@@ -6,9 +6,8 @@ import { AuthContext } from '../context/AuthContext.jsx';
 import CommentForm from '../components/CommentForm.jsx';
 import { Trash2 } from 'lucide-react'; 
 
-// --- 🎯 Simplified CommentItem (Delete Only) ---
+// --- 🎯 Cleaned CommentItem (No Avatars, No Profile Links) ---
 const CommentItem = ({ comment, currentUser, onCommentDeleted }) => {
-    // Check if the logged-in user is the author of this comment
     const isCommentOwner = currentUser && (comment.user?._id === currentUser._id || comment.user === currentUser._id);
 
     const handleDeleteClick = async () => {
@@ -24,22 +23,19 @@ const CommentItem = ({ comment, currentUser, onCommentDeleted }) => {
 
     return (
         <div style={commentItemStyle}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div style={{ flex: 1 }}>
-                    <p style={{ fontWeight: 'bold', fontSize: '0.9em', color: '#007bff', marginBottom: '3px' }}>
-                        {comment.user?.username || 'User'} says:
-                    </p>
-                    <p style={{ margin: '5px 0', color: '#333' }}>{comment.content}</p>
-                </div>
-
-                {/* Only show Delete icon if user is the owner */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={commentAuthorStyle}>{comment.user?.username || 'User'}</span>
+                
                 {isCommentOwner && (
                     <button onClick={handleDeleteClick} style={iconButtonStyle} title="Delete Comment">
-                        <Trash2 size={16} color="#dc3545" />
+                        <Trash2 size={14} color="#dc3545" />
                     </button>
                 )}
             </div>
-            <span style={{ fontSize: '0.75em', color: '#777' }}>
+            <p style={{ margin: '6px 0', color: '#333', fontSize: '0.95em', lineHeight: '1.5' }}>
+                {comment.content}
+            </p>
+            <span style={{ fontSize: '0.75em', color: '#999' }}>
                 {new Date(comment.createdAt).toLocaleDateString()}
             </span>
         </div>
@@ -50,7 +46,7 @@ const PostDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { user } = useContext(AuthContext); 
-    const BACKEND_BASE_URL = 'http://localhost:5000'; 
+    const BACKEND_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'; 
     
     const { data: post, isLoading: isPostLoading, error: postError } = useApi(`/api/posts/${id}`);
     
@@ -99,9 +95,10 @@ const PostDetail = () => {
     return (
         <div style={postDetailContainerStyle}> 
             <h1 style={titleStyle}>{post.title}</h1>
-            <div style={metaStyle}>
-                <span style={categoryBadgeStyle}>Category: {post.category?.name || 'Uncategorized'}</span>
-                <span style={dateStyle}>Published: {new Date(post.createdAt).toLocaleDateString()}</span>
+            
+            <div style={metaSectionStyle}>
+                <span style={categoryBadgeStyle}>{post.category?.name || 'Uncategorized'}</span>
+                <span style={dateStyle}>Published on {new Date(post.createdAt).toLocaleDateString()}</span>
             </div>
             
             {post.imageUrl && (
@@ -126,7 +123,7 @@ const PostDetail = () => {
             <hr style={{ margin: '40px 0', borderColor: '#eee' }} />
             
             <div style={commentsSectionStyle}>
-                <h2>Comments ({comments.length})</h2>
+                <h2 style={{ fontSize: '1.4em', marginBottom: '20px' }}>Comments ({comments.length})</h2>
                 {isCommentsLoading ? <p>Loading comments...</p> : (
                     <div style={{ marginTop: '20px' }}>
                         {comments.map((comment) => (
@@ -142,27 +139,30 @@ const PostDetail = () => {
                 <CommentForm postId={id} onCommentAdded={handleCommentAdded} />
             </div>
 
-            <Link to="/" style={{display: 'block', marginTop: '30px', textDecoration: 'none', color: '#007bff', fontWeight: 'bold'}}>
-                &larr; Back to All Posts
+            <Link to="/" style={backLinkStyle}>
+                &larr; Back to Home
             </Link>
         </div>
     );
 };
 
 // --- Styles ---
-const postDetailContainerStyle = { maxWidth: '800px', margin: '0 auto', padding: '20px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' };
-const titleStyle = { color: '#333', borderBottom: '2px solid #007bff', paddingBottom: '10px', marginBottom: '15px' };
-const metaStyle = { display: 'flex', justifyContent: 'space-between', fontSize: '0.9em', color: '#666', marginBottom: '25px' };
-const categoryBadgeStyle = { backgroundColor: '#e9ecef', padding: '4px 8px', borderRadius: '4px' };
-const dateStyle = { fontStyle: 'italic' };
-const contentStyle = { fontSize: '1.1em', lineHeight: '1.8', whiteSpace: 'pre-wrap', wordWrap: 'break-word', border: '1px solid #eee', padding: '20px', borderRadius: '6px', backgroundColor: '#f9f9f9' };
-const actionsStyle = { marginTop: '30px', textAlign: 'right' };
-const editLinkStyle = { backgroundColor: '#007bff', color: 'white', padding: '10px 15px', borderRadius: '5px', textDecoration: 'none', fontWeight: 'bold', marginRight: '10px' };
-const deleteButtonStyle = { backgroundColor: '#dc3545', color: 'white', padding: '10px 15px', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' };
-const imageWrapperStyle = { margin: '0 0 30px 0', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' };
-const imageStyle = { width: '100%', maxHeight: '400px', objectFit: 'cover', display: 'block' };
-const commentsSectionStyle = { marginTop: '40px', borderTop: '2px dashed #ccc', paddingTop: '30px' };
-const commentItemStyle = { padding: '15px', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '15px', backgroundColor: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' };
-const iconButtonStyle = { background: 'none', border: 'none', cursor: 'pointer', padding: '5px', display: 'flex', alignItems: 'center', transition: 'opacity 0.2s' };
+const postDetailContainerStyle = { maxWidth: '800px', margin: '20px auto', padding: '30px', backgroundColor: '#fff', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' };
+const titleStyle = { fontSize: '2.4em', fontWeight: '800', color: '#1a202c', marginBottom: '10px', lineHeight: '1.2' };
+const metaSectionStyle = { display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px', paddingBottom: '15px', borderBottom: '1px solid #f0f0f0' };
+const categoryBadgeStyle = { backgroundColor: '#eef6ff', color: '#007bff', padding: '4px 12px', borderRadius: '20px', fontWeight: '600', fontSize: '0.85em', textTransform: 'uppercase' };
+const dateStyle = { fontSize: '0.9em', color: '#718096' };
+const contentStyle = { fontSize: '1.15em', lineHeight: '1.8', color: '#4a5568', whiteSpace: 'pre-wrap', marginBottom: '40px' };
+const actionsStyle = { marginTop: '30px', display: 'flex', gap: '10px' };
+const editLinkStyle = { backgroundColor: '#007bff', color: 'white', padding: '10px 20px', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold' };
+const deleteButtonStyle = { backgroundColor: '#fff', color: '#dc3545', padding: '10px 20px', border: '1px solid #dc3545', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' };
+const imageWrapperStyle = { marginBottom: '30px', borderRadius: '12px', overflow: 'hidden' };
+const imageStyle = { width: '100%', maxHeight: '500px', objectFit: 'cover' };
+const commentsSectionStyle = { marginTop: '40px' };
+const commentItemStyle = { padding: '15px 0', borderBottom: '1px solid #f0f0f0', marginBottom: '10px' };
+// 🎯 Removed commentAvatarStyle as it's no longer used
+const commentAuthorStyle = { fontWeight: '700', color: '#2d3748', fontSize: '0.95em' };
+const iconButtonStyle = { background: 'none', border: 'none', cursor: 'pointer', padding: '4px' };
+const backLinkStyle = { display: 'block', marginTop: '40px', textDecoration: 'none', color: '#718096', fontWeight: '600', textAlign: 'center' };
 
 export default PostDetail;

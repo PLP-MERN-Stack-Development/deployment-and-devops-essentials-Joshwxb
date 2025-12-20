@@ -7,6 +7,8 @@ import PostDetail from './pages/PostDetail.jsx';
 import PostForm from './pages/PostForm.jsx'; 
 import Login from './pages/Login.jsx'; 
 import Register from './pages/Register.jsx';
+import Profile from './pages/Profile.jsx'; 
+import PublicProfile from './pages/PublicProfile.jsx'; 
 import './index.css';
 
 function App() {
@@ -17,18 +19,29 @@ function App() {
             <Header />
             <main style={{ padding: '0 20px' }}>
                 <Routes>
-                    {/* Public Routes */}
+                    {/* --- Public Routes --- */}
                     <Route path="/" element={<Home />} /> 
                     
-                    {/* 🎯 Support both singular and plural paths to prevent 404s */}
+                    {/* Post Detail Support */}
                     <Route path="/post/:id" element={<PostDetail />} /> 
                     <Route path="/posts/:id" element={<PostDetail />} /> 
-                    
-                    {/* Authentication Routes (Public) */}
+
+                    {/* Auth Routes */}
                     <Route path="/login" element={<Login />} /> 
                     <Route path="/register" element={<Register />} /> 
                     
-                    {/* SECURED ROUTES */}
+                    {/* --- Profile Routes (Order Matters!) --- */}
+                    
+                    {/* 1. My Own Profile (Private Settings) - MUST BE ABOVE THE DYNAMIC ROUTE */}
+                    <Route 
+                        path="/profile" 
+                        element={user ? <Profile /> : <Navigate to="/login" />} 
+                    /> 
+
+                    {/* 2. Public Profile Viewer (Dynamic ID) */}
+                    <Route path="/profile/:userId" element={<PublicProfile />} />
+                    
+                    {/* --- Secured Post Routes --- */}
                     <Route 
                         path="/create" 
                         element={user ? <PostForm /> : <Navigate to="/login" />} 
@@ -38,7 +51,7 @@ function App() {
                         element={user ? <PostForm /> : <Navigate to="/login" />} 
                     /> 
                     
-                    {/* 404 Route */}
+                    {/* --- 404 Catch-All --- */}
                     <Route path="*" element={<h1 style={{textAlign: 'center', marginTop: '50px'}}>404 Page Not Found</h1>} /> 
                 </Routes>
             </main>
