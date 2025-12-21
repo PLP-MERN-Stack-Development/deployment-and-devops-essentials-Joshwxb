@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'; // 🎯 Added useRef
+import React, { useState, useEffect, useRef } from 'react';
 import { fetchNotifications, markNotificationRead, deleteNotification } from '../apiService';
 import { Link } from 'react-router-dom';
 import { Bell, Trash2, BellOff } from 'lucide-react'; 
@@ -8,21 +8,25 @@ const NotificationBell = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
     
-    // 🎯 Ref to track the notification container
     const bellRef = useRef(null);
 
+    // 🎯 Reusable fetch function for both initial load and polling
+    const getNotifications = async () => {
+        try {
+            const data = await fetchNotifications();
+            // Assuming the API returns the full list; the unread count is calculated below
+            setNotifications(data);
+        } catch (err) {
+            console.error("Failed to fetch notifications", err);
+        }
+    };
+
     useEffect(() => {
-        const getNotifications = async () => {
-            try {
-                const data = await fetchNotifications();
-                setNotifications(data);
-            } catch (err) {
-                console.error("Failed to fetch notifications", err);
-            }
-        };
         getNotifications();
 
-        // 🎯 Logic to handle clicking outside
+        // 🔄 Polling: Check for new notifications every 30 seconds
+        const interval = setInterval(getNotifications, 30000);
+
         const handleClickOutside = (event) => {
             if (bellRef.current && !bellRef.current.contains(event.target)) {
                 setIsOpen(false);
@@ -30,9 +34,13 @@ const NotificationBell = () => {
         };
 
         document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            clearInterval(interval); // Clean up interval on unmount
+        };
     }, []);
 
+    // 🎯 Calculate unread count from the current list
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
     const handleMarkAsRead = async (id) => {
@@ -55,7 +63,6 @@ const NotificationBell = () => {
     };
 
     return (
-        /* 🎯 Attached the Ref here */
         <div className="notification-wrapper" ref={bellRef} style={{ position: 'relative', display: 'inline-block' }}>
             
             {/* 🔔 Modern Bell Icon Trigger */}
@@ -69,17 +76,17 @@ const NotificationBell = () => {
                     padding: '8px',
                     borderRadius: '12px',
                     transition: 'all 0.3s ease',
-                    backgroundColor: isHovered ? 'rgba(97, 218, 251, 0.1)' : 'transparent',
+                    backgroundColor: isHovered ? 'rgba(57, 130, 204, 0.1)' : 'transparent',
                     cursor: 'pointer',
                     transform: isHovered ? 'scale(1.05)' : 'scale(1)',
                 }}
             >
                 <Bell 
                     size={24} 
-                    color="#3982ccff" 
-                    fill={unreadCount > 0 ? "#3e89d4ff" : "none"} 
+                    color="#007bff" 
+                    fill={unreadCount > 0 ? "#007bff" : "none"} 
                     style={{
-                        filter: isHovered ? 'drop-shadow(0 0 8px #007bff' : 'none',
+                        filter: isHovered ? 'drop-shadow(0 0 8px rgba(0, 123, 255, 0.5))' : 'none',
                         transition: 'filter 0.3s ease'
                     }}
                 />
@@ -99,10 +106,10 @@ const NotificationBell = () => {
                         justifyContent: 'center',
                         fontSize: '10px',
                         fontWeight: '800',
-                        border: '2px solid #20232a',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                        border: '2px solid #0a0000ff',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                     }}>
-                        {unreadCount}
+                        {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                 )}
             </div>
@@ -156,7 +163,8 @@ const NotificationBell = () => {
                                         display: 'flex',
                                         transition: 'background 0.2s ease',
                                         gap: '12px',
-                                        alignItems: 'start'
+                                        alignItems: 'start',
+                                        cursor: 'pointer'
                                      }}>
                                     
                                     <div style={{ flex: 1 }}>
@@ -168,7 +176,7 @@ const NotificationBell = () => {
                                             <p style={{ margin: '0 0 4px 0', fontSize: '13px', lineHeight: '1.4' }}>
                                                 <strong style={{ color: '#2f3542' }}>{n.sender?.username}</strong>
                                                 <span style={{ color: '#57606f' }}> commented on </span>
-                                                <span style={{ fontWeight: '600', color: '#007bff' }}>{n.post?.title}</span>
+                                                <span style={{ fontWeight: '600', color: '#007bff' }}>{n.post?.title || 'a post'}</span>
                                             </p>
                                         </Link>
                                     </div>

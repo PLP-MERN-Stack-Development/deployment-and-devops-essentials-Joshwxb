@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom'; // Added useLocation
 import { useAuth } from '../context/AuthContext'; 
 import logo from '../assets/logo.png.jpg'; 
 import NotificationBell from './NotificationBell';
@@ -7,6 +7,7 @@ import NotificationBell from './NotificationBell';
 const Header = () => {
     const { isAuthenticated, user, logout } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation(); // Hook to track current URL path
     const [isMenuOpen, setIsMenuOpen] = useState(false); 
 
     const handleNavigationClick = (path) => {
@@ -43,7 +44,8 @@ const Header = () => {
             }}>
                 {isAuthenticated && (
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <NotificationBell />
+                        {/* 🎯 KEY CHANGE: Added key={location.pathname} to force a refresh on every click */}
+                        <NotificationBell key={location.pathname} />
                     </div>
                 )}
                 
@@ -72,8 +74,6 @@ const Header = () => {
                         <Link to="/profile" className="nav-item" onClick={() => handleNavigationClick('/profile')}>
                             Profile
                         </Link>
-
-                        {/* 🎯 GREETING REMOVED FROM HERE AS REQUESTED */}
 
                         <button onClick={handleLogout} className="nav-item nav-button">
                             Logout
