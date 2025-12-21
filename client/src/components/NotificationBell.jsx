@@ -83,7 +83,7 @@ const NotificationBell = () => {
             >
                 <Bell 
                     size={24} 
-                    color="#007bff" 
+                    color="#0275f0ff" 
                     fill={unreadCount > 0 ? "#007bff" : "none"} 
                     style={{
                         filter: isHovered ? 'drop-shadow(0 0 8px rgba(0, 123, 255, 0.5))' : 'none',
