@@ -144,12 +144,7 @@ const Home = () => {
                   <div style={{ padding: '25px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                         <p style={cardCategoryStyle}>{post.category?.name || 'Uncategorized'}</p>
-                        <Link 
-                            to={`/profile/${post.author?._id}`} 
-                            style={{ fontSize: '0.8rem', color: '#718096', textDecoration: 'none', fontWeight: '600' }}
-                        >
-                            by {post.author?.username || 'User'}
-                        </Link>
+                        {/* 🎯 "by User" Link has been removed from here */}
                     </div>
 
                     <h2 style={cardTitleStyle}> 
@@ -190,7 +185,6 @@ const Home = () => {
         )}
       </div>
 
-      {/* Footer is now back inside Home.jsx only */}
       <footer style={footerStyle}>
         <div style={footerMainContent}>
           <div style={footerBrandSection}>
@@ -214,7 +208,7 @@ const Home = () => {
   );
 };
 
-// Styles
+// Styles remain unchanged
 const containerStyle = { maxWidth: '1100px', margin: '0 auto', padding: '40px 20px', flexGrow: 1 };
 const filterSectionStyle = { display: 'flex', justifyContent: 'center', marginBottom: '50px' };
 const titleStyle = { textAlign: 'left', fontSize: '1.8rem', fontWeight: '800', marginBottom: '30px', color: '#1a202c', borderLeft: '5px solid #007bff', paddingLeft: '15px' };
@@ -224,7 +218,6 @@ const cardTitleStyle = { fontSize: '1.35rem', marginBottom: '12px', fontWeight: 
 const linkStyle = { textDecoration: 'none', color: '#1a202c' };
 const cardCategoryStyle = { fontSize: '0.75rem', fontWeight: '800', color: '#007bff', textTransform: 'uppercase', letterSpacing: '1px' };
 const readMoreLinkStyle = { color: '#007bff', textDecoration: 'none', fontWeight: '700', fontSize: '0.9rem' };
-
 const footerStyle = { backgroundColor: '#f8fafc', borderTop: '1px solid #edf2f7', padding: '60px 20px 30px 20px', marginTop: '80px' };
 const footerMainContent = { maxWidth: '1100px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '20px' };
 const footerBrandSection = { textAlign: 'left', maxWidth: '300px' };
