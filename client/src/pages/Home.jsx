@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState } from 'react'; 
 import { Link, useLocation } from 'react-router-dom'; 
 import useApi from '../hooks/useApi.js';
 import { FaXTwitter, FaInstagram, FaTiktok } from 'react-icons/fa6'; 
@@ -60,7 +60,6 @@ const Home = () => {
             border-color: #007bff;
             box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
           }
-
           .empty-state-container {
             text-align: center;
             padding: 60px 40px;
@@ -71,7 +70,6 @@ const Home = () => {
             margin: 40px auto;
             max-width: 600px;
           }
-
           .back-btn {
             background: #007bff;
             color: white;
@@ -88,15 +86,10 @@ const Home = () => {
             gap: 10px;
             box-shadow: 0 4px 14px 0 rgba(0, 123, 255, 0.39);
           }
-
           .back-btn:hover {
             background: #0056b3;
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 123, 255, 0.23);
-          }
-
-          .back-btn:active {
-            transform: translateY(0);
           }
         `}
       </style>
@@ -149,7 +142,16 @@ const Home = () => {
                   )}
                   
                   <div style={{ padding: '25px' }}>
-                    <p style={cardCategoryStyle}>{post.category?.name || 'Uncategorized'}</p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                        <p style={cardCategoryStyle}>{post.category?.name || 'Uncategorized'}</p>
+                        <Link 
+                            to={`/profile/${post.author?._id}`} 
+                            style={{ fontSize: '0.8rem', color: '#718096', textDecoration: 'none', fontWeight: '600' }}
+                        >
+                            by {post.author?.username || 'User'}
+                        </Link>
+                    </div>
+
                     <h2 style={cardTitleStyle}> 
                       <Link to={`/posts/${post._id}`} style={linkStyle}>{post.title}</Link>
                     </h2>
@@ -175,7 +177,6 @@ const Home = () => {
             animate={{ opacity: 1, scale: 1 }}
             className="empty-state-container"
           >
-            {/* 🎯 Icon removed for a cleaner look */}
             <h3 style={{ color: '#2d3748', fontSize: '1.5rem', fontWeight: '700', margin: '0 0 10px 0' }}>
               No posts found
             </h3>
@@ -188,7 +189,8 @@ const Home = () => {
           </motion.div>
         )}
       </div>
-      
+
+      {/* Footer is now back inside Home.jsx only */}
       <footer style={footerStyle}>
         <div style={footerMainContent}>
           <div style={footerBrandSection}>
@@ -196,13 +198,16 @@ const Home = () => {
             <p style={footerTagline}>A modern platform for creating, sharing, and discovering valuable content.</p>
           </div>
           <div style={footerSocialSection}>
-            <Link to="https://chat.whatsapp.com/IK3Cy47ouwDIh8xwGDYJ5s" style={footerIcon}><FaXTwitter size={22} /></Link>
-            <Link to="https://chat.whatsapp.com/IK3Cy47ouwDIh8xwGDYJ5s" style={footerIcon}><FaInstagram size={22} /></Link>
-            <Link to="https://chat.whatsapp.com/IK3Cy47ouwDIh8xwGDYJ5s" style={footerIcon}><FaTiktok size={22} /></Link>
+            <a href="https://chat.whatsapp.com/IK3Cy47ouwDIh8xwGDYJ5s" target="_blank" rel="noreferrer" style={footerIcon}><FaXTwitter size={22} /></a>
+            <a href="https://chat.whatsapp.com/IK3Cy47ouwDIh8xwGDYJ5s" target="_blank" rel="noreferrer" style={footerIcon}><FaInstagram size={22} /></a>
+            <a href="https://chat.whatsapp.com/IK3Cy47ouwDIh8xwGDYJ5s" target="_blank" rel="noreferrer" style={footerIcon}><FaTiktok size={22} /></a>
           </div>
         </div>
         <div style={footerBottom}>
           <p>&copy; {new Date().getFullYear()} All Rights Reserved.</p>
+          <div style={{ marginTop: '10px' }}>
+            <Link to="/privacy-policy" style={privacyLinkStyle}>Privacy Policy</Link>
+          </div>
         </div>
       </footer>
     </div>
@@ -217,7 +222,7 @@ const cardStyle = { backgroundColor: '#fff', borderRadius: '16px', boxShadow: '0
 const thumbnailStyle = { width: '100%', height: '240px', objectFit: 'cover', display: 'block' };
 const cardTitleStyle = { fontSize: '1.35rem', marginBottom: '12px', fontWeight: '800', lineHeight: '1.3' };
 const linkStyle = { textDecoration: 'none', color: '#1a202c' };
-const cardCategoryStyle = { fontSize: '0.75rem', fontWeight: '800', color: '#007bff', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' };
+const cardCategoryStyle = { fontSize: '0.75rem', fontWeight: '800', color: '#007bff', textTransform: 'uppercase', letterSpacing: '1px' };
 const readMoreLinkStyle = { color: '#007bff', textDecoration: 'none', fontWeight: '700', fontSize: '0.9rem' };
 
 const footerStyle = { backgroundColor: '#f8fafc', borderTop: '1px solid #edf2f7', padding: '60px 20px 30px 20px', marginTop: '80px' };
@@ -226,7 +231,8 @@ const footerBrandSection = { textAlign: 'left', maxWidth: '300px' };
 const footerLogo = { fontSize: '1.5rem', fontWeight: '900', color: '#1a202c', margin: '0 0 10px 0', letterSpacing: '-0.5px' };
 const footerTagline = { fontSize: '0.95rem', color: '#718096', lineHeight: '1.5', margin: 0 };
 const footerSocialSection = { display: 'flex', gap: '20px', alignItems: 'center' };
-const footerIcon = { color: '#1a202c', transition: 'opacity 0.2s', cursor: 'pointer' };
+const footerIcon = { color: '#1a202c', transition: 'opacity 0.2s', cursor: 'pointer', textDecoration: 'none' };
 const footerBottom = { maxWidth: '1100px', margin: '40px auto 0 auto', paddingTop: '20px', borderTop: '1px solid #e2e8f0', textAlign: 'center', color: '#a0aec0', fontSize: '0.85rem' };
+const privacyLinkStyle = { color: '#007bff', textDecoration: 'none', fontWeight: '600', fontSize: '0.85rem' };
 
 export default Home;
