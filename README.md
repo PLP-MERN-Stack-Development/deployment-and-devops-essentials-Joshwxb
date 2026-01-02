@@ -1,66 +1,62 @@
-# 🚀 Digital MERN Blog Platform
+# 🚀 Deployment Guide: Weblog MERN Stack
 
-A high-performance, full-stack content sharing platform. Users can create accounts, publish articles, engage with content through comments, and manage their professional profiles.
+This document outlines the production setup for the **mern blog** application. The project is architecture-optimized using a decoupled deployment strategy: **Vercel** for the frontend and **Render** for the backend.
 
-## 🌐 Live Application
-**Frontend URL:** [https://weblogn.vercel.app/](https://weblogn.vercel.app/)
-
----
-
-## ✨ Features
-- **User Authentication:** Secure Login and Registration using JWT.
-- **Content Management:** Full CRUD for blog posts.
-- **Interactive Engagement:** Real-time commenting system.
-- **User Profiles:** Customizable settings and public profile views.
-- **Analytics & Ads:** Meta Pixel (ID: 1549070872910843) and Google AdSense integrated.
+## 🌐 Live URL
+**Production Site:** [https://weblogn.vercel.app/](https://weblogn.vercel.app/)
 
 ---
 
-## 🌐 Deployment Architecture
+## 🛠️ Backend Deployment (Render)
 
-The application is split into two specialized hosting environments to maximize performance and cost-efficiency:
+The backend is a Node.js/Express API connected to MongoDB Atlas.
 
-### 🎨 Frontend (Client)
-- **Hosted on:** [Vercel](https://vercel.com)
-- **Live URL:** `https://weblogn.vercel.app/`
-- **Technology:** React.js + Vite
-- **Environment Variables:** `VITE_BACKEND_URL` (points to the Render API).
+### 1. Configuration
+- **Service Type:** Web Service
+- **Runtime:** Node
+- **Build Command:** `npm install`
+- **Start Command:** `node server.js` (or `npm start`)
 
-### ⚙️ Backend (API)
-- **Hosted on:** [Render](https://render.com)
-- **Technology:** Node.js + Express.js
-- **Database:** MongoDB Atlas (Cloud)
-- **Environment Variables:** `MONGO_URI`, `JWT_SECRET`, `NODE_ENV`.
+### 2. Environment Variables
+Add these in the **Environment** tab on Render:
+| Variable | Value |
+| :--- | :--- |
+| `NODE_ENV` | `production` |
+| `MONGO_URI` | 
+| `JWT_SECRET` | 
+| `PORT` | `5000` |
 
 
 
 ---
 
-## 🚀 Setup & Installation
+## 💻 Frontend Deployment (Vercel)
 
-### Backend (Render)
-1. Connect GitHub repo to Render.
-2. Build Command: `npm install`
-3. Start Command: `node server.js`
+The frontend is a React application built with Vite.
 
-### Frontend (Vercel)
-1. Connect GitHub repo to Vercel.
-2. Select the `client` folder as the Root Directory.
-3. Build Command: `npm run build`
-4. Output Directory: `dist`
+### 1. Configuration
+- **Framework Preset:** `Vite`
+- **Root Directory:** `client`
+- **Build Command:** `npm run build`
+- **Output Directory:** `dist`
 
----
+### 2. Environment Variables
+Add these in **Project Settings > Environment Variables** on Vercel:
+| Variable | Value |
+| :--- | :--- |
+| `VITE_BACKEND_URL` | 
 
-## 📊 Analytics Tracking
-This project uses a hybrid tracking approach:
-1. **Base Code:** In `index.html` for initial script loading.
-2. **Route Tracking:** A `useEffect` hook in `App.jsx` listens to `useLocation()` to fire `PageView` events on every SPA navigation change.
+
 
 ---
 
-## 🔧 Local Development Troubleshooting
-- **CORS Errors:** Ensure `https://weblogn.vercel.app` is allowed in your backend `server.js` CORS configuration.
+## 🔗 Cross-Origin Resource Sharing (CORS)
 
----
+For the frontend at `weblogn.vercel.app` to communicate with the Render API, the backend must allow the origin. Ensure your `server/server.js` contains:
 
-&copy; 2026 Digital Content Platform. All Rights Reserved.
+```javascript
+const cors = require('cors');
+app.use(cors({
+  origin: '[https://weblogn.vercel.app](https://weblogn.vercel.app)',
+  credentials: true
+}));
