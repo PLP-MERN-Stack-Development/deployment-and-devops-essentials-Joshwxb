@@ -22,7 +22,7 @@ const PORT = process.env.PORT || 5000;
 const allowedStaticOrigins = [
     'https://weblogn.vercel.app', 
     'http://localhost:5173', 
-    'https://weblog-6vnn.onrender.com'
+    'https://weblog-n5t4.onrender.com' // ✅ Updated to your new Render URL
 ];
 
 const corsOptions = {
@@ -44,13 +44,13 @@ const corsOptions = {
         }
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: ['Content-Type', 'Authorization'], // ✅ Added to support JWT and JSON requests
     credentials: true, 
 };
 
 // --- Middleware ---
 app.use(cors(corsOptions)); 
 app.use(express.json()); 
-// If you ever need to handle standard form-data (non-file), this is helpful:
 app.use(express.urlencoded({ extended: true }));
 
 // --- API Routes ---
@@ -59,7 +59,7 @@ app.use('/api/posts', postRoutes);
 app.use('/api/auth', authRoutes); 
 app.use('/api/comments', commentRoutes); 
 app.use('/api/notifications', notificationRoutes);
-app.use('/api/users', userRoutes); // 🎯 User/Profile routes registered
+app.use('/api/users', userRoutes); 
 
 // --- MongoDB Connection ---
 const connectDB = async () => {
